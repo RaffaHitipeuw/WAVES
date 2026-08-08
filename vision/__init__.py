@@ -1,22 +1,5 @@
 """
 Vision module for HydroSignal.
-
-This module handles computer vision processing for flood water level estimation.
-
-Architecture:
-    VIDEO FRAME
-        ↓
-    ROI EXTRACTION
-        ↓
-    WATERLINE DETECTION
-        ↓
-    CALIBRATION
-        ↓
-    MEASUREMENT
-        ↓
-    TEMPORAL SMOOTHING
-        ↓
-    RISK DETERMINATION
 """
 
 from .waterline import WaterlineDetector

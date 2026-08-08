@@ -16,7 +16,6 @@ export function useFloodWebSocket() {
   const addToHistory = useCallback((reading) => {
     setHistory(prev => {
       const newHistory = [...prev, reading]
-
       if (newHistory.length > MAX_HISTORY) {
         return newHistory.slice(-MAX_HISTORY)
       }
@@ -71,7 +70,6 @@ export function useFloodWebSocket() {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current)
     }
-
     const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 16000)
     reconnectAttempts.current += 1
     console.log(`[WebSocket] Reconnecting in ${delay}ms...`)

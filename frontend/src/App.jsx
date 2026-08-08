@@ -89,9 +89,6 @@ function formatTime(timestamp) {
   }
 }
 
-// ============================================
-// STATUS BAR
-// ============================================
 function StatusBar({ status, nodeId, mode, progress }) {
   return (
     <div className="status-bar">
@@ -125,10 +122,7 @@ function StatusBar({ status, nodeId, mode, progress }) {
   )
 }
 
-// ============================================
-// VIDEO MONITOR
-// ============================================
-function VideoMonitor({ videoRef, measurement, isPlaying }) {
+function VideoMonitor({ videoRef, measurement, isPlaying, mode }) {
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
   const StatusIcon = statusConfig.icon
 
@@ -143,8 +137,6 @@ function VideoMonitor({ videoRef, measurement, isPlaying }) {
         playsInline
       />
       <div className="video-overlay" />
-
-      {/* Timestamp */}
       <div className="video-timestamp">
         <div className="video-timestamp-badge">
           <div className="flex items-center gap-2">
@@ -162,8 +154,6 @@ function VideoMonitor({ videoRef, measurement, isPlaying }) {
           </div>
         )}
       </div>
-
-      {/* Not playing placeholder */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-bg-primary/90">
           <div className="text-center">
@@ -173,8 +163,6 @@ function VideoMonitor({ videoRef, measurement, isPlaying }) {
           </div>
         </div>
       )}
-
-      {/* HUD Overlay */}
       <div className="video-hud">
         <div className="video-hud-item">
           <div className="video-hud-label">Water Level</div>
@@ -214,12 +202,8 @@ function VideoMonitor({ videoRef, measurement, isPlaying }) {
   )
 }
 
-// ============================================
-// PRIMARY WATER LEVEL DISPLAY
-// ============================================
 function PrimaryDisplay({ measurement, risk }) {
   const riskConfig = RISK_CONFIG[risk] || RISK_CONFIG.SAFE
-
   const waterLevel = measurement?.waterLevel
   const isValid = measurement?.isValid !== false
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
@@ -244,9 +228,6 @@ function PrimaryDisplay({ measurement, risk }) {
   )
 }
 
-// ============================================
-// METRIC CARDS
-// ============================================
 function MetricCard({ label, value, unit, trend, children }) {
   return (
     <div className="metric-card">
@@ -263,9 +244,6 @@ function MetricCard({ label, value, unit, trend, children }) {
   )
 }
 
-// ============================================
-// CONFIDENCE CARD
-// ============================================
 function ConfidenceCard({ measurement }) {
   const percentage = measurement ? Math.round((measurement.confidence || 0) * 100) : 0
   const isValid = measurement?.isValid !== false
@@ -299,9 +277,6 @@ function ConfidenceCard({ measurement }) {
   )
 }
 
-// ============================================
-// RATE OF RISE PANEL
-// ============================================
 function RateOfRisePanel({ measurement, history }) {
   const rateOfChange = measurement?.rateOfChange || 0
   const trend = measurement?.trend || 'UNKNOWN'
@@ -347,9 +322,6 @@ function RateOfRisePanel({ measurement, history }) {
   )
 }
 
-// ============================================
-// WATER LEVEL CHART
-// ============================================
 function WaterLevelChart({ history, measurement }) {
   const thresholds = { watch: 30, warning: 50, critical: 70 }
 
@@ -449,9 +421,6 @@ function WaterLevelChart({ history, measurement }) {
   )
 }
 
-// ============================================
-// SYSTEM STATUS PANEL
-// ============================================
 function SystemStatus({ measurement, data, mode }) {
   const state = data?.state || {}
   const isValid = measurement?.isValid !== false
@@ -483,9 +452,6 @@ function SystemStatus({ measurement, data, mode }) {
   )
 }
 
-// ============================================
-// RISK ALERT
-// ============================================
 function RiskAlert({ measurement, data }) {
   const risk = data?.state?.risk || measurement?.risk || 'SAFE'
   const riskConfig = RISK_CONFIG[risk] || RISK_CONFIG.SAFE
@@ -512,9 +478,6 @@ function RiskAlert({ measurement, data }) {
   )
 }
 
-// ============================================
-// CONTROLS
-// ============================================
 function Controls({ onStart, onStop, onReset, onModeChange, isRunning, mode, onVideoSelect }) {
   return (
     <div className="controls-panel">
@@ -562,9 +525,6 @@ function Controls({ onStart, onStop, onReset, onModeChange, isRunning, mode, onV
   )
 }
 
-// ============================================
-// THRESHOLDS
-// ============================================
 function Thresholds() {
   const thresholds = [
     { label: 'WATCH', value: '30 cm', color: 'text-risk-watch' },
@@ -590,9 +550,6 @@ function Thresholds() {
   )
 }
 
-// ============================================
-// APP SHELL
-// ============================================
 function App() {
   const { connected, connectionStatus, data, history } = useFloodWebSocket()
   const [isRunning, setIsRunning] = useState(false)
@@ -626,12 +583,10 @@ function App() {
 
   const handleStart = async () => {
     try {
-      // First set mode if different
       if (mode !== systemMode) {
         await fetch(`${API_BASE}/api/mode?mode=${mode}`, { method: 'POST' })
         setSystemMode(mode)
       }
-
       const response = await fetch(`${API_BASE}/api/start`, { method: 'POST' })
       const result = await response.json()
       if (result.status === 'started' || result.status === 'already_running') {
@@ -670,29 +625,23 @@ function App() {
   return (
     <div className="app-shell">
       <div className="app-container">
-        {/* Status Bar */}
         <StatusBar
           status={connectionStatus}
           nodeId={nodeId}
           mode={systemMode}
           progress={progress}
         />
-
-        {/* Video Monitor */}
         <div className="mb-6">
           <VideoMonitor
             videoRef={videoRef}
             measurement={measurement}
             isPlaying={isVideoPlaying}
+            mode={systemMode}
           />
         </div>
-
-        {/* Primary Display */}
         <div className="mb-6">
           <PrimaryDisplay measurement={measurement} risk={risk} />
         </div>
-
-        {/* Metric Cards Grid */}
         <div className="metric-grid mb-6">
           <MetricCard
             label="Smoothed"
@@ -719,19 +668,13 @@ function App() {
             </div>
           </MetricCard>
         </div>
-
-        {/* Chart */}
         <div className="mb-6">
           <WaterLevelChart history={history} measurement={measurement} />
         </div>
-
-        {/* Rate of Rise + System Status */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <RateOfRisePanel measurement={measurement} history={history} />
           <SystemStatus measurement={measurement} data={data} mode={systemMode} />
         </div>
-
-        {/* Controls + Thresholds */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <Controls
             onStart={handleStart}
@@ -743,15 +686,11 @@ function App() {
           />
           <Thresholds />
         </div>
-
-        {/* Risk Alert */}
         {(risk !== 'SAFE' || !isValid) && (
           <div className="mb-6 animate-fade-in">
             <RiskAlert measurement={measurement} data={data} />
           </div>
         )}
-
-        {/* Footer */}
         <div className="app-footer">
           <div className="footer-text">
             HydroSignal v2.0 • Real-time Flood Monitoring • Computer Vision Engine

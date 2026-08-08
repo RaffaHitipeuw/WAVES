@@ -1,6 +1,13 @@
-from models import WaterLevelReading, MonitoringNode, ProcessedReading, Alert, RiskLevel, DataSource
-from simulator import WaterLevelSimulator, AsyncWaterLevelSimulator, SimulatorConfig
-from engine import CoreEngine, FloodEngine
+from .models import WaterLevelReading, MonitoringNode, ProcessedReading, Alert, RiskLevel, DataSource
+from .simulator import WaterLevelSimulator, AsyncWaterLevelSimulator, SimulatorConfig
+from .engine import CoreEngine, FloodEngine
+from .epistemic import (
+    EntityType, RelationType, UnknownCategory, ValidityStatus,
+    EntityId, ClaimId, EvidenceId, AssumptionId, FailureModeId,
+    ValidityScope, ScopedValidity,
+    Metric, ProbabilityClaim, Provenance, Requirement, ValidationRecord,
+    Entity, Evidence, Claim, Assumption, FailureMode, GranularUnknown,
+)
 
 __all__ = [
     "WaterLevelReading",
@@ -13,5 +20,27 @@ __all__ = [
     "AsyncWaterLevelSimulator",
     "SimulatorConfig",
     "CoreEngine",
-    "FloodEngine"
+    "FloodEngine",
+    "EntityType",
+    "RelationType",
+    "UnknownCategory",
+    "ValidityStatus",
+    "EntityId",
+    "ClaimId",
+    "EvidenceId",
+    "AssumptionId",
+    "FailureModeId",
+    "ValidityScope",
+    "ScopedValidity",
+    "Metric",
+    "ProbabilityClaim",
+    "Provenance",
+    "Requirement",
+    "ValidationRecord",
+    "Entity",
+    "Evidence",
+    "Claim",
+    "Assumption",
+    "FailureMode",
+    "GranularUnknown",
 ]

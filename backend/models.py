@@ -25,9 +25,7 @@ class WaterLevelReading:
     water_level: float
     timestamp: datetime = field(default_factory=datetime.now)
     source: DataSource = DataSource.SIMULATOR
-    id: str = field(
-        default_factory=lambda: str(uuid.uuid4())[:12]
-    )
+    id: str = field(default_factory=lambda: str(uuid.uuid4())[:12])
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -70,9 +68,7 @@ class ProcessedReading:
     reading: WaterLevelReading
     raw_water_level: float
     smoothed_water_level: float
-    processed_at: datetime = field(
-        default_factory=datetime.now
-    )
+    processed_at: datetime = field(default_factory=datetime.now)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -90,9 +86,7 @@ class Alert:
     message: str
     node_id: str
     confidence: float = 1.0
-    timestamp: datetime = field(
-        default_factory=datetime.now
-    )
+    timestamp: datetime = field(default_factory=datetime.now)
     water_level: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:

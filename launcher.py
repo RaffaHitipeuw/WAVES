@@ -37,19 +37,26 @@ browser_lock = threading.Lock()
 
 def log(msg):
     from datetime import datetime
-
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"[{timestamp}] {msg}")
 
 
 def check_port(port):
     import socket
-
+    # Try IPv4 first
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(("localhost", port))
+    result = sock.connect_ex(("127.0.0.1", port))
     sock.close()
-
-    return result != 0
+    if result == 0:
+        return True
+    # Try IPv6
+    try:
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        result = sock.connect_ex(("::1", port))
+        sock.close()
+        return result == 0
+    except:
+        return False
 
 
 def wait_for_url(url, timeout=60, check_interval=0.5):
@@ -61,10 +68,8 @@ def wait_for_url(url, timeout=60, check_interval=0.5):
     while time.time() - start_time < timeout:
         try:
             response = urllib.request.urlopen(url, timeout=2)
-
             if response.status == 200:
                 return True
-
         except (urllib.error.URLError, Exception):
             pass
 
@@ -84,7 +89,6 @@ def open_browser_once():
 
 
 def copy_video_to_public():
-    # Try multiple possible video filenames
     video_sources = [
         DATA_DIR / "assets.mp4",
         DATA_DIR / "asset.mp4",
@@ -126,9 +130,7 @@ def start_backend():
             str(BACKEND_PORT),
         ],
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
+        stderr=subprocess.PIPE,
     )
 
     log(f"Waiting for backend at {BACKEND_URL}...")
@@ -159,9 +161,7 @@ def start_frontend():
     process = subprocess.Popen(
         [npm_cmd, "run", "dev"],
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
+        stderr=subprocess.PIPE,
     )
 
     log(f"Waiting for frontend at {FRONTEND_URL}...")
@@ -197,20 +197,18 @@ def main():
     print("=" * 60)
 
     try:
+        # Simple wait loop - just wait for keyboard interrupt
+        # Don't check process status since Popen.poll() can be unreliable
         while True:
-            # Check if either process has died
-            backend_alive = backend_process is not None and backend_process.poll() is None
-            frontend_alive = frontend_process is not None and frontend_process.poll() is None
+            time.sleep(1)
 
-            if not backend_alive:
-                log("WARNING: Backend process ended")
+            # Check if port is still open
+            if not check_port(BACKEND_PORT):
+                log("WARNING: Backend port not responding")
                 break
-
-            if not frontend_alive:
-                log("WARNING: Frontend process ended")
+            if not check_port(FRONTEND_PORT):
+                log("WARNING: Frontend port not responding")
                 break
-
-            time.sleep(0.5)
 
     except KeyboardInterrupt:
         print()
@@ -218,14 +216,14 @@ def main():
 
     log("Stopping processes...")
 
-    if backend_process and backend_process.poll() is None:
+    if backend_process:
         backend_process.terminate()
         try:
             backend_process.wait(timeout=5)
         except:
             backend_process.kill()
 
-    if frontend_process and frontend_process.poll() is None:
+    if frontend_process:
         frontend_process.terminate()
         try:
             frontend_process.wait(timeout=5)
