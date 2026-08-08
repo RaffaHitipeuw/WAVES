@@ -4,7 +4,8 @@ uvicorn[standard]>=0.23.0
 websockets>=11.0.0
 pydantic>=2.0.0
 
-# Computer Vision
+# Computer Vision (for later Tier integration)
+# Uncomment when CV is implemented:
 # opencv-python-headless>=4.8.0
 # numpy>=1.24.0
 # scipy>=1.11.0
@@ -13,3 +14,4 @@ pydantic>=2.0.0
 
 # Optional ML (uncomment if using TensorFlow Lite)
 # tensorflow>=2.14.0
+    

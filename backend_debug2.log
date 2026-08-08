@@ -1,0 +1,193 @@
+INFO:     Started server process [11424]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+==================================================
+HYDROSIGNAL - FLOOD EARLY WARNING SYSTEM
+==================================================
+Node: NODE-001 (Jakarta Basin A)
+Thresholds: {'watch': 30, 'warning': 50, 'critical': 70}
+WebSocket: ws://localhost:8000/ws
+REST API: http://localhost:8000/api
+==================================================
+[Start Simulator] Called!
+[Start Simulator] Creating task...
+[Start Simulator] Task created
+INFO:     127.0.0.1:57659 - "POST /api/simulator/start HTTP/1.1" 200 OK
+[Simulator Loop] Started, broadcasting to 0 clients
+[Simulator] Reading #1: 20.7 cm (rising)
+[Flood Engine] Reading #1: 20.7 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #2: 21.1 cm (rising)
+[Flood Engine] Reading #2: 21.1 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #3: 21.4 cm (rising)
+[Flood Engine] Reading #3: 21.4 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #4: 22.0 cm (rising)
+[Flood Engine] Reading #4: 22.0 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #5: 22.4 cm (rising)
+[Flood Engine] Reading #5: 22.4 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 5 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #6: 23.0 cm (rising)
+[Flood Engine] Reading #6: 23.0 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #7: 23.7 cm (rising)
+[Flood Engine] Reading #7: 23.7 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #8: 24.3 cm (rising)
+[Flood Engine] Reading #8: 24.3 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #9: 24.3 cm (rising)
+[Flood Engine] Reading #9: 24.3 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #10: 25.3 cm (rising)
+[Flood Engine] Reading #10: 25.3 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 10 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #11: 25.4 cm (rising)
+[Flood Engine] Reading #11: 25.4 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #12: 25.8 cm (rising)
+[Flood Engine] Reading #12: 25.8 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #13: 26.6 cm (rising)
+[Flood Engine] Reading #13: 26.6 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #14: 26.8 cm (rising)
+[Flood Engine] Reading #14: 26.8 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #15: 27.5 cm (rising)
+[Flood Engine] Reading #15: 27.5 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 15 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #16: 27.7 cm (rising)
+[Flood Engine] Reading #16: 27.7 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #17: 28.3 cm (rising)
+[Flood Engine] Reading #17: 28.3 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #18: 29.2 cm (rising)
+[Flood Engine] Reading #18: 29.2 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #19: 29.4 cm (rising)
+[Flood Engine] Reading #19: 29.4 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #20: 29.8 cm (rising)
+[Flood Engine] Reading #20: 29.8 cm | Risk: SAFE
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 20 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #21: 30.3 cm (rising)
+[Flood Engine] Reading #21: 30.3 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #22: 30.9 cm (rising)
+[Flood Engine] Reading #22: 30.9 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #23: 31.3 cm (rising)
+[Flood Engine] Reading #23: 31.3 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #24: 32.1 cm (rising)
+[Flood Engine] Reading #24: 32.1 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #25: 32.5 cm (rising)
+[Flood Engine] Reading #25: 32.5 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 25 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #26: 33.0 cm (rising)
+[Flood Engine] Reading #26: 33.0 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #27: 33.3 cm (rising)
+[Flood Engine] Reading #27: 33.3 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #28: 33.8 cm (rising)
+[Flood Engine] Reading #28: 33.8 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #29: 34.3 cm (rising)
+[Flood Engine] Reading #29: 34.3 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #30: 35.3 cm (rising)
+[Flood Engine] Reading #30: 35.3 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 30 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #31: 35.5 cm (rising)
+[Flood Engine] Reading #31: 35.5 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #32: 35.8 cm (rising)
+[Flood Engine] Reading #32: 35.8 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #33: 36.5 cm (rising)
+[Flood Engine] Reading #33: 36.5 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #34: 36.7 cm (rising)
+[Flood Engine] Reading #34: 36.7 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #35: 37.5 cm (rising)
+[Flood Engine] Reading #35: 37.5 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 35 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #36: 37.8 cm (rising)
+[Flood Engine] Reading #36: 37.8 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #37: 38.8 cm (rising)
+[Flood Engine] Reading #37: 38.8 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #38: 38.8 cm (rising)
+[Flood Engine] Reading #38: 38.8 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #39: 39.7 cm (rising)
+[Flood Engine] Reading #39: 39.7 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #40: 40.2 cm (rising)
+[Flood Engine] Reading #40: 40.2 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Simulator Loop] Broadcast 40 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #41: 40.6 cm (rising)
+[Flood Engine] Reading #41: 40.6 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #42: 40.9 cm (rising)
+[Flood Engine] Reading #42: 40.9 cm | Risk: WATCH
+[Sim Loop] Created broadcast task for reading
+[Broadcast] No active connections, skipping

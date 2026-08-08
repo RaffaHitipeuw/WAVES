@@ -1,0 +1,547 @@
+INFO:     Started server process [16672]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+==================================================
+HYDROSIGNAL - FLOOD EARLY WARNING SYSTEM
+==================================================
+Node: NODE-001 (Jakarta Basin A)
+Thresholds: {'watch': 30, 'warning': 50, 'critical': 70}
+WebSocket: ws://localhost:8000/ws
+REST API: http://localhost:8000/api
+==================================================
+INFO:     127.0.0.1:54305 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58159 - "GET /api/simulator/start HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:59674 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64018 - "POST /api/simulator/start HTTP/1.1" 200 OK
+[Simulator Loop] Started, broadcasting to 0 clients
+[Simulator] Reading #1: 20.8 cm (rising)
+[Flood Engine] Reading #1: 20.8 cm | Risk: SAFE
+[Simulator] Reading #2: 21.2 cm (rising)
+[Flood Engine] Reading #2: 21.2 cm | Risk: SAFE
+INFO:     127.0.0.1:64020 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54954 - "WebSocket /ws" [accepted]
+INFO:     connection open
+[Simulator] Reading #3: 21.8 cm (rising)
+[Flood Engine] Reading #3: 21.8 cm | Risk: SAFE
+[Simulator] Reading #4: 22.2 cm (rising)
+[Flood Engine] Reading #4: 22.2 cm | Risk: SAFE
+[Simulator] Reading #5: 22.3 cm (rising)
+[Flood Engine] Reading #5: 22.3 cm | Risk: SAFE
+[Simulator Loop] Broadcast 5 readings, 0 clients
+[Simulator] Reading #6: 22.9 cm (rising)
+[Flood Engine] Reading #6: 22.9 cm | Risk: SAFE
+[Simulator] Reading #7: 23.4 cm (rising)
+[Flood Engine] Reading #7: 23.4 cm | Risk: SAFE
+[Simulator] Reading #8: 23.7 cm (rising)
+[Flood Engine] Reading #8: 23.7 cm | Risk: SAFE
+[Simulator] Reading #9: 24.7 cm (rising)
+[Flood Engine] Reading #9: 24.7 cm | Risk: SAFE
+[Simulator] Reading #10: 25.1 cm (rising)
+[Flood Engine] Reading #10: 25.1 cm | Risk: SAFE
+[Simulator Loop] Broadcast 10 readings, 0 clients
+[Simulator] Reading #11: 25.6 cm (rising)
+[Flood Engine] Reading #11: 25.6 cm | Risk: SAFE
+[Simulator] Reading #12: 26.1 cm (rising)
+[Flood Engine] Reading #12: 26.1 cm | Risk: SAFE
+[Simulator] Reading #13: 26.7 cm (rising)
+[Flood Engine] Reading #13: 26.7 cm | Risk: SAFE
+[Simulator] Reading #14: 27.2 cm (rising)
+[Flood Engine] Reading #14: 27.2 cm | Risk: SAFE
+[Simulator] Reading #15: 27.4 cm (rising)
+[Flood Engine] Reading #15: 27.4 cm | Risk: SAFE
+[Simulator Loop] Broadcast 15 readings, 0 clients
+[Simulator] Reading #16: 28.0 cm (rising)
+[Flood Engine] Reading #16: 28.0 cm | Risk: SAFE
+[Simulator] Reading #17: 28.3 cm (rising)
+[Flood Engine] Reading #17: 28.3 cm | Risk: SAFE
+[Simulator] Reading #18: 28.7 cm (rising)
+[Flood Engine] Reading #18: 28.7 cm | Risk: SAFE
+[Simulator] Reading #19: 29.6 cm (rising)
+[Flood Engine] Reading #19: 29.6 cm | Risk: SAFE
+[Simulator] Reading #20: 30.1 cm (rising)
+[Flood Engine] Reading #20: 30.1 cm | Risk: WATCH
+[Simulator Loop] Broadcast 20 readings, 0 clients
+[Simulator] Reading #21: 30.7 cm (rising)
+[Flood Engine] Reading #21: 30.7 cm | Risk: WATCH
+[Simulator] Reading #22: 30.7 cm (rising)
+[Flood Engine] Reading #22: 30.7 cm | Risk: WATCH
+[Simulator] Reading #23: 31.4 cm (rising)
+[Flood Engine] Reading #23: 31.4 cm | Risk: WATCH
+[Simulator] Reading #24: 32.0 cm (rising)
+[Flood Engine] Reading #24: 32.0 cm | Risk: WATCH
+[Simulator] Reading #25: 32.4 cm (rising)
+[Flood Engine] Reading #25: 32.4 cm | Risk: WATCH
+[Simulator Loop] Broadcast 25 readings, 0 clients
+[Simulator] Reading #26: 32.7 cm (rising)
+[Flood Engine] Reading #26: 32.7 cm | Risk: WATCH
+[Simulator] Reading #27: 33.7 cm (rising)
+[Flood Engine] Reading #27: 33.7 cm | Risk: WATCH
+[Simulator] Reading #28: 33.8 cm (rising)
+[Flood Engine] Reading #28: 33.8 cm | Risk: WATCH
+[Simulator] Reading #29: 34.4 cm (rising)
+[Flood Engine] Reading #29: 34.4 cm | Risk: WATCH
+[Simulator] Reading #30: 34.8 cm (rising)
+[Flood Engine] Reading #30: 34.8 cm | Risk: WATCH
+[Simulator Loop] Broadcast 30 readings, 0 clients
+[Simulator] Reading #31: 35.4 cm (rising)
+[Flood Engine] Reading #31: 35.4 cm | Risk: WATCH
+[Simulator] Reading #32: 36.2 cm (rising)
+[Flood Engine] Reading #32: 36.2 cm | Risk: WATCH
+[Simulator] Reading #33: 36.4 cm (rising)
+[Flood Engine] Reading #33: 36.4 cm | Risk: WATCH
+[Simulator] Reading #34: 36.8 cm (rising)
+[Flood Engine] Reading #34: 36.8 cm | Risk: WATCH
+[Simulator] Reading #35: 37.2 cm (rising)
+[Flood Engine] Reading #35: 37.2 cm | Risk: WATCH
+[Simulator Loop] Broadcast 35 readings, 0 clients
+[Simulator] Reading #36: 38.2 cm (rising)
+[Flood Engine] Reading #36: 38.2 cm | Risk: WATCH
+[Simulator] Reading #37: 38.6 cm (rising)
+[Flood Engine] Reading #37: 38.6 cm | Risk: WATCH
+[Simulator] Reading #38: 39.0 cm (rising)
+[Flood Engine] Reading #38: 39.0 cm | Risk: WATCH
+[Simulator] Reading #39: 39.5 cm (rising)
+[Flood Engine] Reading #39: 39.5 cm | Risk: WATCH
+[Simulator] Reading #40: 39.8 cm (rising)
+[Flood Engine] Reading #40: 39.8 cm | Risk: WATCH
+[Simulator Loop] Broadcast 40 readings, 0 clients
+[Simulator] Reading #41: 40.7 cm (rising)
+[Flood Engine] Reading #41: 40.7 cm | Risk: WATCH
+[Simulator] Reading #42: 40.7 cm (rising)
+[Flood Engine] Reading #42: 40.7 cm | Risk: WATCH
+[Simulator] Reading #43: 41.6 cm (rising)
+[Flood Engine] Reading #43: 41.6 cm | Risk: WATCH
+[Simulator] Reading #44: 42.3 cm (rising)
+[Flood Engine] Reading #44: 42.3 cm | Risk: WATCH
+[Simulator] Reading #45: 42.2 cm (rising)
+[Flood Engine] Reading #45: 42.2 cm | Risk: WATCH
+[Simulator Loop] Broadcast 45 readings, 0 clients
+[Simulator] Reading #46: 43.1 cm (rising)
+[Flood Engine] Reading #46: 43.1 cm | Risk: WATCH
+[Simulator] Reading #47: 43.6 cm (rising)
+[Flood Engine] Reading #47: 43.6 cm | Risk: WATCH
+[WebSocket] Client connected. Total: 1
+[Simulator] Reading #48: 43.9 cm (rising)
+[Flood Engine] Reading #48: 43.9 cm | Risk: WATCH
+[Simulator] Reading #49: 44.5 cm (rising)
+[Flood Engine] Reading #49: 44.5 cm | Risk: WATCH
+[Simulator] Reading #50: 45.0 cm (rising)
+[Flood Engine] Reading #50: 45.0 cm | Risk: WATCH
+[Simulator Loop] Broadcast 50 readings, 1 clients
+[Simulator] Reading #51: 45.3 cm (rising)
+[Flood Engine] Reading #51: 45.3 cm | Risk: WATCH
+[Simulator] Reading #52: 46.3 cm (rising)
+[Flood Engine] Reading #52: 46.3 cm | Risk: WATCH
+[Simulator] Reading #53: 46.4 cm (rising)
+[Flood Engine] Reading #53: 46.4 cm | Risk: WATCH
+[WebSocket] Client disconnected. Total: 0
+[Simulator] Reading #54: 47.0 cm (rising)
+[Flood Engine] Reading #54: 47.0 cm | Risk: WATCH
+[Simulator] Reading #55: 47.6 cm (rising)
+[Flood Engine] Reading #55: 47.6 cm | Risk: WATCH
+[Simulator Loop] Broadcast 55 readings, 0 clients
+[Simulator] Reading #56: 48.0 cm (rising)
+[Flood Engine] Reading #56: 48.0 cm | Risk: WATCH
+[Simulator] Reading #57: 48.4 cm (rising)
+[Flood Engine] Reading #57: 48.4 cm | Risk: WATCH
+[Simulator] Reading #58: 49.3 cm (rising)
+[Flood Engine] Reading #58: 49.3 cm | Risk: WATCH
+[Simulator] Reading #59: 49.5 cm (rising)
+[Flood Engine] Reading #59: 49.5 cm | Risk: WATCH
+[Simulator] Reading #60: 50.2 cm (rising)
+[Flood Engine] Reading #60: 50.2 cm | Risk: WARNING
+[Simulator Loop] Broadcast 60 readings, 0 clients
+[Simulator] Reading #61: 50.8 cm (rising)
+[Flood Engine] Reading #61: 50.8 cm | Risk: WARNING
+[Simulator] Reading #62: 51.1 cm (rising)
+[Flood Engine] Reading #62: 51.1 cm | Risk: WARNING
+[Simulator] Reading #63: 51.5 cm (rising)
+[Flood Engine] Reading #63: 51.5 cm | Risk: WARNING
+[Simulator] Reading #64: 51.7 cm (rising)
+[Flood Engine] Reading #64: 51.7 cm | Risk: WARNING
+[Simulator] Reading #65: 52.8 cm (rising)
+[Flood Engine] Reading #65: 52.8 cm | Risk: WARNING
+[Simulator Loop] Broadcast 65 readings, 0 clients
+[Simulator] Reading #66: 52.9 cm (rising)
+[Flood Engine] Reading #66: 52.9 cm | Risk: WARNING
+[Simulator] Reading #67: 53.3 cm (rising)
+[Flood Engine] Reading #67: 53.3 cm | Risk: WARNING
+[Simulator] Reading #68: 54.0 cm (rising)
+[Flood Engine] Reading #68: 54.0 cm | Risk: WARNING
+[Simulator] Reading #69: 54.3 cm (rising)
+[Flood Engine] Reading #69: 54.3 cm | Risk: WARNING
+[Simulator] Reading #70: 55.0 cm (rising)
+[Flood Engine] Reading #70: 55.0 cm | Risk: WARNING
+[Simulator Loop] Broadcast 70 readings, 0 clients
+[Simulator] Reading #71: 55.2 cm (rising)
+[Flood Engine] Reading #71: 55.2 cm | Risk: WARNING
+[Simulator] Reading #72: 56.3 cm (rising)
+[Flood Engine] Reading #72: 56.3 cm | Risk: WARNING
+[Simulator] Reading #73: 56.3 cm (rising)
+[Flood Engine] Reading #73: 56.3 cm | Risk: WARNING
+[Simulator] Reading #74: 57.2 cm (rising)
+[Flood Engine] Reading #74: 57.2 cm | Risk: WARNING
+[Simulator] Reading #75: 57.5 cm (rising)
+[Flood Engine] Reading #75: 57.5 cm | Risk: WARNING
+[Simulator Loop] Broadcast 75 readings, 0 clients
+[Simulator] Reading #76: 57.9 cm (rising)
+[Flood Engine] Reading #76: 57.9 cm | Risk: WARNING
+[Simulator] Reading #77: 58.3 cm (rising)
+[Flood Engine] Reading #77: 58.3 cm | Risk: WARNING
+[Simulator] Reading #78: 59.2 cm (rising)
+[Flood Engine] Reading #78: 59.2 cm | Risk: WARNING
+[Simulator] Reading #79: 59.4 cm (rising)
+[Flood Engine] Reading #79: 59.4 cm | Risk: WARNING
+[Simulator] Reading #80: 60.2 cm (rising)
+[Flood Engine] Reading #80: 60.2 cm | Risk: WARNING
+[Simulator Loop] Broadcast 80 readings, 0 clients
+[Simulator] Reading #81: 60.4 cm (rising)
+[Flood Engine] Reading #81: 60.4 cm | Risk: WARNING
+[Simulator] Reading #82: 60.9 cm (rising)
+[Flood Engine] Reading #82: 60.9 cm | Risk: WARNING
+[Simulator] Reading #83: 61.7 cm (rising)
+[Flood Engine] Reading #83: 61.7 cm | Risk: WARNING
+[Simulator] Reading #84: 62.1 cm (rising)
+[Flood Engine] Reading #84: 62.1 cm | Risk: WARNING
+[Simulator] Reading #85: 62.5 cm (rising)
+[Flood Engine] Reading #85: 62.5 cm | Risk: WARNING
+[Simulator Loop] Broadcast 85 readings, 0 clients
+[Simulator] Reading #86: 63.2 cm (rising)
+[Flood Engine] Reading #86: 63.2 cm | Risk: WARNING
+[Simulator] Reading #87: 63.3 cm (rising)
+[Flood Engine] Reading #87: 63.3 cm | Risk: WARNING
+[Simulator] Reading #88: 64.1 cm (rising)
+[Flood Engine] Reading #88: 64.1 cm | Risk: WARNING
+[Simulator] Reading #89: 64.2 cm (rising)
+[Flood Engine] Reading #89: 64.2 cm | Risk: WARNING
+[Simulator] Reading #90: 65.0 cm (rising)
+[Flood Engine] Reading #90: 65.0 cm | Risk: WARNING
+[Simulator Loop] Broadcast 90 readings, 0 clients
+[Simulator] Reading #91: 65.7 cm (rising)
+[Flood Engine] Reading #91: 65.7 cm | Risk: WARNING
+[Simulator] Reading #92: 66.1 cm (rising)
+[Flood Engine] Reading #92: 66.1 cm | Risk: WARNING
+[Simulator] Reading #93: 66.4 cm (rising)
+[Flood Engine] Reading #93: 66.4 cm | Risk: WARNING
+[Simulator] Reading #94: 66.8 cm (rising)
+[Flood Engine] Reading #94: 66.8 cm | Risk: WARNING
+[Simulator] Reading #95: 67.7 cm (rising)
+[Flood Engine] Reading #95: 67.7 cm | Risk: WARNING
+[Simulator Loop] Broadcast 95 readings, 0 clients
+[Simulator] Reading #96: 68.2 cm (rising)
+[Flood Engine] Reading #96: 68.2 cm | Risk: WARNING
+[Simulator] Reading #97: 68.3 cm (rising)
+[Flood Engine] Reading #97: 68.3 cm | Risk: WARNING
+[Simulator] Reading #98: 69.1 cm (rising)
+[Flood Engine] Reading #98: 69.1 cm | Risk: WARNING
+[Simulator] Reading #99: 69.7 cm (rising)
+[Flood Engine] Reading #99: 69.7 cm | Risk: WARNING
+[Simulator] Reading #100: 69.8 cm (rising)
+[Flood Engine] Reading #100: 69.8 cm | Risk: WARNING
+[Simulator Loop] Broadcast 100 readings, 0 clients
+[Simulator] Reading #101: 70.2 cm (rising)
+[Flood Engine] Reading #101: 70.2 cm | Risk: CRITICAL
+[Simulator] Reading #102: 70.8 cm (rising)
+[Flood Engine] Reading #102: 70.8 cm | Risk: CRITICAL
+[Simulator] Reading #103: 71.3 cm (rising)
+[Flood Engine] Reading #103: 71.3 cm | Risk: CRITICAL
+[Simulator] Reading #104: 72.1 cm (rising)
+[Flood Engine] Reading #104: 72.1 cm | Risk: CRITICAL
+[Simulator] Reading #105: 72.7 cm (rising)
+[Flood Engine] Reading #105: 72.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 105 readings, 0 clients
+[Simulator] Reading #106: 73.2 cm (rising)
+[Flood Engine] Reading #106: 73.2 cm | Risk: CRITICAL
+[Simulator] Reading #107: 73.3 cm (rising)
+[Flood Engine] Reading #107: 73.3 cm | Risk: CRITICAL
+[Simulator] Reading #108: 74.2 cm (rising)
+[Flood Engine] Reading #108: 74.2 cm | Risk: CRITICAL
+INFO:     127.0.0.1:54155 - "GET /api/status HTTP/1.1" 200 OK
+[Simulator] Reading #109: 74.2 cm (rising)
+[Flood Engine] Reading #109: 74.2 cm | Risk: CRITICAL
+[Simulator] Reading #110: 75.0 cm (rising)
+[Flood Engine] Reading #110: 75.0 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 110 readings, 0 clients
+[Simulator] Reading #111: 75.4 cm (rising)
+[Flood Engine] Reading #111: 75.4 cm | Risk: CRITICAL
+[Simulator] Reading #112: 76.0 cm (rising)
+[Flood Engine] Reading #112: 76.0 cm | Risk: CRITICAL
+[Simulator] Reading #113: 76.5 cm (rising)
+[Flood Engine] Reading #113: 76.5 cm | Risk: CRITICAL
+[Simulator] Reading #114: 76.8 cm (rising)
+[Flood Engine] Reading #114: 76.8 cm | Risk: CRITICAL
+[Simulator] Reading #115: 77.5 cm (rising)
+[Flood Engine] Reading #115: 77.5 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 115 readings, 0 clients
+[Simulator] Reading #116: 78.2 cm (rising)
+[Flood Engine] Reading #116: 78.2 cm | Risk: CRITICAL
+[Simulator] Reading #117: 78.4 cm (rising)
+[Flood Engine] Reading #117: 78.4 cm | Risk: CRITICAL
+[Simulator] Reading #118: 78.8 cm (rising)
+[Flood Engine] Reading #118: 78.8 cm | Risk: CRITICAL
+[Simulator] Reading #119: 79.6 cm (rising)
+[Flood Engine] Reading #119: 79.6 cm | Risk: CRITICAL
+[Simulator] Reading #120: 79.8 cm (rising)
+[Flood Engine] Reading #120: 79.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 120 readings, 0 clients
+[Simulator] Reading #121: 80.8 cm (rising)
+[Flood Engine] Reading #121: 80.8 cm | Risk: CRITICAL
+[Simulator] Reading #122: 81.1 cm (rising)
+[Flood Engine] Reading #122: 81.1 cm | Risk: CRITICAL
+[Simulator] Reading #123: 81.6 cm (rising)
+[Flood Engine] Reading #123: 81.6 cm | Risk: CRITICAL
+[Simulator] Reading #124: 82.0 cm (rising)
+[Flood Engine] Reading #124: 82.0 cm | Risk: CRITICAL
+[Simulator] Reading #125: 82.6 cm (rising)
+[Flood Engine] Reading #125: 82.6 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 125 readings, 0 clients
+[Simulator] Reading #126: 83.2 cm (rising)
+[Flood Engine] Reading #126: 83.2 cm | Risk: CRITICAL
+[Simulator] Reading #127: 83.7 cm (rising)
+[Flood Engine] Reading #127: 83.7 cm | Risk: CRITICAL
+[Simulator] Reading #128: 83.9 cm (rising)
+[Flood Engine] Reading #128: 83.9 cm | Risk: CRITICAL
+[Simulator] Reading #129: 84.3 cm (rising)
+[Flood Engine] Reading #129: 84.3 cm | Risk: CRITICAL
+[Simulator] Reading #130: 84.8 cm (rising)
+[Flood Engine] Reading #130: 84.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 130 readings, 0 clients
+[Simulator] Reading #131: 85.4 cm (rising)
+[Flood Engine] Reading #131: 85.4 cm | Risk: CRITICAL
+[Simulator] Reading #132: 86.0 cm (rising)
+[Flood Engine] Reading #132: 86.0 cm | Risk: CRITICAL
+[Simulator] Reading #133: 86.3 cm (rising)
+[Flood Engine] Reading #133: 86.3 cm | Risk: CRITICAL
+[Simulator] Reading #134: 87.0 cm (rising)
+[Flood Engine] Reading #134: 87.0 cm | Risk: CRITICAL
+[Simulator] Reading #135: 87.6 cm (rising)
+[Flood Engine] Reading #135: 87.6 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 135 readings, 0 clients
+[Simulator] Reading #136: 88.0 cm (rising)
+[Flood Engine] Reading #136: 88.0 cm | Risk: CRITICAL
+[Simulator] Reading #137: 88.7 cm (rising)
+[Flood Engine] Reading #137: 88.7 cm | Risk: CRITICAL
+[Simulator] Reading #138: 89.3 cm (rising)
+[Flood Engine] Reading #138: 89.3 cm | Risk: CRITICAL
+[Simulator] Reading #139: 89.8 cm (rising)
+[Flood Engine] Reading #139: 89.8 cm | Risk: CRITICAL
+[Simulator] Reading #140: 90.1 cm (rising)
+[Flood Engine] Reading #140: 90.1 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 140 readings, 0 clients
+[Simulator] Reading #141: 90.8 cm (rising)
+[Flood Engine] Reading #141: 90.8 cm | Risk: CRITICAL
+[Simulator] Reading #142: 91.2 cm (rising)
+[Flood Engine] Reading #142: 91.2 cm | Risk: CRITICAL
+[Simulator] Reading #143: 91.2 cm (rising)
+[Flood Engine] Reading #143: 91.2 cm | Risk: CRITICAL
+[Simulator] Reading #144: 91.8 cm (rising)
+[Flood Engine] Reading #144: 91.8 cm | Risk: CRITICAL
+[Simulator] Reading #145: 92.8 cm (rising)
+[Flood Engine] Reading #145: 92.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 145 readings, 0 clients
+[Simulator] Reading #146: 93.0 cm (rising)
+[Flood Engine] Reading #146: 93.0 cm | Risk: CRITICAL
+[Simulator] Reading #147: 93.4 cm (rising)
+[Flood Engine] Reading #147: 93.4 cm | Risk: CRITICAL
+[Simulator] Reading #148: 94.2 cm (rising)
+[Flood Engine] Reading #148: 94.2 cm | Risk: CRITICAL
+[Simulator] Reading #149: 94.5 cm (rising)
+[Flood Engine] Reading #149: 94.5 cm | Risk: CRITICAL
+[Simulator] Reading #150: 94.9 cm (rising)
+[Flood Engine] Reading #150: 94.9 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 150 readings, 0 clients
+[Simulator] Reading #151: 95.5 cm (rising)
+[Flood Engine] Reading #151: 95.5 cm | Risk: CRITICAL
+[Simulator] Reading #152: 96.3 cm (rising)
+[Flood Engine] Reading #152: 96.3 cm | Risk: CRITICAL
+[Simulator] Reading #153: 96.6 cm (rising)
+[Flood Engine] Reading #153: 96.6 cm | Risk: CRITICAL
+[Simulator] Reading #154: 96.9 cm (rising)
+[Flood Engine] Reading #154: 96.9 cm | Risk: CRITICAL
+[Simulator] Reading #155: 97.8 cm (rising)
+[Flood Engine] Reading #155: 97.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 155 readings, 0 clients
+[Simulator] Reading #156: 97.8 cm (rising)
+[Flood Engine] Reading #156: 97.8 cm | Risk: CRITICAL
+[Simulator] Reading #157: 98.4 cm (rising)
+[Flood Engine] Reading #157: 98.4 cm | Risk: CRITICAL
+[Simulator] Reading #158: 99.3 cm (rising)
+[Flood Engine] Reading #158: 99.3 cm | Risk: CRITICAL
+[Simulator] Reading #159: 99.3 cm (rising)
+[Flood Engine] Reading #159: 99.3 cm | Risk: CRITICAL
+[Simulator] Reading #160: 100.0 cm (rising)
+[Flood Engine] Reading #160: 100.0 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 160 readings, 0 clients
+[Simulator] Reading #161: 100.4 cm (rising)
+[Flood Engine] Reading #161: 100.4 cm | Risk: CRITICAL
+[Simulator] Reading #162: 101.0 cm (rising)
+[Flood Engine] Reading #162: 101.0 cm | Risk: CRITICAL
+[Simulator] Reading #163: 101.5 cm (rising)
+[Flood Engine] Reading #163: 101.5 cm | Risk: CRITICAL
+INFO:     127.0.0.1:53786 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53790 - "WebSocket /ws" [accepted]
+INFO:     connection open
+[Simulator] Reading #164: 101.9 cm (rising)
+[Flood Engine] Reading #164: 101.9 cm | Risk: CRITICAL
+[Simulator] Reading #165: 102.6 cm (rising)
+[Flood Engine] Reading #165: 102.6 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 165 readings, 0 clients
+[WebSocket] Client connected. Total: 1
+[WebSocket] Client disconnected. Total: 0
+[Simulator] Reading #166: 103.2 cm (rising)
+[Flood Engine] Reading #166: 103.2 cm | Risk: CRITICAL
+[Simulator] Reading #167: 103.7 cm (rising)
+[Flood Engine] Reading #167: 103.7 cm | Risk: CRITICAL
+[Simulator] Reading #168: 104.1 cm (rising)
+[Flood Engine] Reading #168: 104.1 cm | Risk: CRITICAL
+[Simulator] Reading #169: 104.5 cm (rising)
+[Flood Engine] Reading #169: 104.5 cm | Risk: CRITICAL
+[Simulator] Reading #170: 105.0 cm (rising)
+[Flood Engine] Reading #170: 105.0 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 170 readings, 0 clients
+[Simulator] Reading #171: 105.3 cm (rising)
+[Flood Engine] Reading #171: 105.3 cm | Risk: CRITICAL
+[Simulator] Reading #172: 106.0 cm (rising)
+[Flood Engine] Reading #172: 106.0 cm | Risk: CRITICAL
+[Simulator] Reading #173: 106.8 cm (rising)
+[Flood Engine] Reading #173: 106.8 cm | Risk: CRITICAL
+[Simulator] Reading #174: 107.1 cm (rising)
+[Flood Engine] Reading #174: 107.1 cm | Risk: CRITICAL
+[Simulator] Reading #175: 107.5 cm (rising)
+[Flood Engine] Reading #175: 107.5 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 175 readings, 0 clients
+[Simulator] Reading #176: 107.9 cm (rising)
+[Flood Engine] Reading #176: 107.9 cm | Risk: CRITICAL
+[Simulator] Reading #177: 108.5 cm (rising)
+[Flood Engine] Reading #177: 108.5 cm | Risk: CRITICAL
+[Simulator] Reading #178: 108.8 cm (rising)
+[Flood Engine] Reading #178: 108.8 cm | Risk: CRITICAL
+[Simulator] Reading #179: 109.5 cm (rising)
+[Flood Engine] Reading #179: 109.5 cm | Risk: CRITICAL
+[Simulator] Reading #180: 109.7 cm (rising)
+[Flood Engine] Reading #180: 109.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 180 readings, 0 clients
+[Simulator] Reading #181: 110.8 cm (rising)
+[Flood Engine] Reading #181: 110.8 cm | Risk: CRITICAL
+[Simulator] Reading #182: 111.0 cm (rising)
+[Flood Engine] Reading #182: 111.0 cm | Risk: CRITICAL
+[Simulator] Reading #183: 111.8 cm (rising)
+[Flood Engine] Reading #183: 111.8 cm | Risk: CRITICAL
+[Simulator] Reading #184: 112.0 cm (rising)
+[Flood Engine] Reading #184: 112.0 cm | Risk: CRITICAL
+[Simulator] Reading #185: 112.4 cm (rising)
+[Flood Engine] Reading #185: 112.4 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 185 readings, 0 clients
+[Simulator] Reading #186: 113.1 cm (rising)
+[Flood Engine] Reading #186: 113.1 cm | Risk: CRITICAL
+[Simulator] Reading #187: 113.3 cm (rising)
+[Flood Engine] Reading #187: 113.3 cm | Risk: CRITICAL
+[Simulator] Reading #188: 113.9 cm (rising)
+[Flood Engine] Reading #188: 113.9 cm | Risk: CRITICAL
+[Simulator] Reading #189: 114.6 cm (rising)
+[Flood Engine] Reading #189: 114.6 cm | Risk: CRITICAL
+[Simulator] Reading #190: 114.7 cm (rising)
+[Flood Engine] Reading #190: 114.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 190 readings, 0 clients
+[Simulator] Reading #191: 115.7 cm (rising)
+[Flood Engine] Reading #191: 115.7 cm | Risk: CRITICAL
+[Simulator] Reading #192: 116.2 cm (rising)
+[Flood Engine] Reading #192: 116.2 cm | Risk: CRITICAL
+[Simulator] Reading #193: 116.6 cm (rising)
+[Flood Engine] Reading #193: 116.6 cm | Risk: CRITICAL
+[Simulator] Reading #194: 116.9 cm (rising)
+[Flood Engine] Reading #194: 116.9 cm | Risk: CRITICAL
+[Simulator] Reading #195: 117.7 cm (rising)
+[Flood Engine] Reading #195: 117.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 195 readings, 0 clients
+[Simulator] Reading #196: 118.0 cm (rising)
+[Flood Engine] Reading #196: 118.0 cm | Risk: CRITICAL
+[Simulator] Reading #197: 118.3 cm (rising)
+[Flood Engine] Reading #197: 118.3 cm | Risk: CRITICAL
+[Simulator] Reading #198: 119.2 cm (rising)
+[Flood Engine] Reading #198: 119.2 cm | Risk: CRITICAL
+[Simulator] Reading #199: 119.5 cm (rising)
+[Flood Engine] Reading #199: 119.5 cm | Risk: CRITICAL
+[Simulator] Reading #200: 120.3 cm (rising)
+[Flood Engine] Reading #200: 120.3 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 200 readings, 0 clients
+[Simulator] Reading #201: 120.4 cm (rising)
+[Flood Engine] Reading #201: 120.4 cm | Risk: CRITICAL
+[Simulator] Reading #202: 121.0 cm (rising)
+[Flood Engine] Reading #202: 121.0 cm | Risk: CRITICAL
+[Simulator] Reading #203: 121.4 cm (rising)
+[Flood Engine] Reading #203: 121.4 cm | Risk: CRITICAL
+[Simulator] Reading #204: 122.2 cm (rising)
+[Flood Engine] Reading #204: 122.2 cm | Risk: CRITICAL
+[Simulator] Reading #205: 122.7 cm (rising)
+[Flood Engine] Reading #205: 122.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 205 readings, 0 clients
+[Simulator] Reading #206: 123.3 cm (rising)
+[Flood Engine] Reading #206: 123.3 cm | Risk: CRITICAL
+[Simulator] Reading #207: 123.6 cm (rising)
+[Flood Engine] Reading #207: 123.6 cm | Risk: CRITICAL
+[Simulator] Reading #208: 124.2 cm (rising)
+[Flood Engine] Reading #208: 124.2 cm | Risk: CRITICAL
+[Simulator] Reading #209: 124.8 cm (rising)
+[Flood Engine] Reading #209: 124.8 cm | Risk: CRITICAL
+[Simulator] Reading #210: 124.8 cm (rising)
+[Flood Engine] Reading #210: 124.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 210 readings, 0 clients
+[Simulator] Reading #211: 125.7 cm (rising)
+[Flood Engine] Reading #211: 125.7 cm | Risk: CRITICAL
+[Simulator] Reading #212: 125.7 cm (rising)
+[Flood Engine] Reading #212: 125.7 cm | Risk: CRITICAL
+[Simulator] Reading #213: 126.4 cm (rising)
+[Flood Engine] Reading #213: 126.4 cm | Risk: CRITICAL
+[Simulator] Reading #214: 126.8 cm (rising)
+[Flood Engine] Reading #214: 126.8 cm | Risk: CRITICAL
+[Simulator] Reading #215: 127.7 cm (rising)
+[Flood Engine] Reading #215: 127.7 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 215 readings, 0 clients
+[Simulator] Reading #216: 127.8 cm (rising)
+[Flood Engine] Reading #216: 127.8 cm | Risk: CRITICAL
+[Simulator] Reading #217: 128.6 cm (rising)
+[Flood Engine] Reading #217: 128.6 cm | Risk: CRITICAL
+[Simulator] Reading #218: 129.0 cm (rising)
+[Flood Engine] Reading #218: 129.0 cm | Risk: CRITICAL
+[Simulator] Reading #219: 129.5 cm (rising)
+[Flood Engine] Reading #219: 129.5 cm | Risk: CRITICAL
+[Simulator] Reading #220: 129.9 cm (rising)
+[Flood Engine] Reading #220: 129.9 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 220 readings, 0 clients
+[Simulator] Reading #221: 130.3 cm (rising)
+[Flood Engine] Reading #221: 130.3 cm | Risk: CRITICAL
+[Simulator] Reading #222: 130.7 cm (rising)
+[Flood Engine] Reading #222: 130.7 cm | Risk: CRITICAL
+[Simulator] Reading #223: 131.3 cm (rising)
+[Flood Engine] Reading #223: 131.3 cm | Risk: CRITICAL
+[Simulator] Reading #224: 132.2 cm (rising)
+[Flood Engine] Reading #224: 132.2 cm | Risk: CRITICAL
+[Simulator] Reading #225: 132.6 cm (rising)
+[Flood Engine] Reading #225: 132.6 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 225 readings, 0 clients
+[Simulator] Reading #226: 133.1 cm (rising)
+[Flood Engine] Reading #226: 133.1 cm | Risk: CRITICAL
+[Simulator] Reading #227: 133.8 cm (rising)
+[Flood Engine] Reading #227: 133.8 cm | Risk: CRITICAL
+[Simulator] Reading #228: 133.9 cm (rising)
+[Flood Engine] Reading #228: 133.9 cm | Risk: CRITICAL
+[Simulator] Reading #229: 134.4 cm (rising)
+[Flood Engine] Reading #229: 134.4 cm | Risk: CRITICAL
+[Simulator] Reading #230: 134.8 cm (rising)
+[Flood Engine] Reading #230: 134.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 230 readings, 0 clients
+[Simulator] Reading #231: 135.4 cm (rising)
+[Flood Engine] Reading #231: 135.4 cm | Risk: CRITICAL
+[Simulator] Reading #232: 136.1 cm (rising)
+[Flood Engine] Reading #232: 136.1 cm | Risk: CRITICAL
+[Simulator] Reading #233: 136.8 cm (rising)
+[Flood Engine] Reading #233: 136.8 cm | Risk: CRITICAL
+[Simulator] Reading #234: 136.9 cm (rising)
+[Flood Engine] Reading #234: 136.9 cm | Risk: CRITICAL
+[Simulator] Reading #235: 137.8 cm (rising)
+[Flood Engine] Reading #235: 137.8 cm | Risk: CRITICAL
+[Simulator Loop] Broadcast 235 readings, 0 clients
+[Simulator] Reading #236: 137.8 cm (rising)
+[Flood Engine] Reading #236: 137.8 cm | Risk: CRITICAL

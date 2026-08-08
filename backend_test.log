@@ -1,0 +1,332 @@
+INFO:     Started server process [20120]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+==================================================
+HYDROSIGNAL - FLOOD EARLY WARNING SYSTEM
+==================================================
+Node: NODE-001 (Jakarta Basin A)
+Thresholds: {'watch': 30, 'warning': 50, 'critical': 70}
+WebSocket: ws://localhost:8000/ws
+REST API: http://localhost:8000/api
+==================================================
+INFO:     127.0.0.1:51267 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51269 - "POST /api/simulator/start HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51273 - "WebSocket /ws" [accepted]
+INFO:     connection open
+[Simulator Loop] Started, broadcasting to 0 clients
+[Simulator] Reading #1: 20.6 cm (rising)
+[Flood Engine] Reading #1: 20.6 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #2: 20.9 cm (rising)
+[Flood Engine] Reading #2: 20.9 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #3: 21.6 cm (rising)
+[Flood Engine] Reading #3: 21.6 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[WebSocket] Client connected. Total: 1
+[Simulator] Reading #4: 22.3 cm (rising)
+[Flood Engine] Reading #4: 22.3 cm | Risk: SAFE
+[Broadcast] Sending to 1 connections
+[Simulator] Reading #5: 22.6 cm (rising)
+[Flood Engine] Reading #5: 22.6 cm | Risk: SAFE
+[Simulator Loop] Broadcast 5 readings, 1 clients
+[Broadcast] Sending to 1 connections
+[WebSocket] Client disconnected. Total: 0
+[Simulator] Reading #6: 23.1 cm (rising)
+[Flood Engine] Reading #6: 23.1 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #7: 23.8 cm (rising)
+[Flood Engine] Reading #7: 23.8 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #8: 23.9 cm (rising)
+[Flood Engine] Reading #8: 23.9 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #9: 24.8 cm (rising)
+[Flood Engine] Reading #9: 24.8 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #10: 25.1 cm (rising)
+[Flood Engine] Reading #10: 25.1 cm | Risk: SAFE
+[Simulator Loop] Broadcast 10 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #11: 25.5 cm (rising)
+[Flood Engine] Reading #11: 25.5 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #12: 26.2 cm (rising)
+[Flood Engine] Reading #12: 26.2 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #13: 26.5 cm (rising)
+[Flood Engine] Reading #13: 26.5 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #14: 26.9 cm (rising)
+[Flood Engine] Reading #14: 26.9 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #15: 27.6 cm (rising)
+[Flood Engine] Reading #15: 27.6 cm | Risk: SAFE
+[Simulator Loop] Broadcast 15 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #16: 28.0 cm (rising)
+[Flood Engine] Reading #16: 28.0 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #17: 28.2 cm (rising)
+[Flood Engine] Reading #17: 28.2 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #18: 28.8 cm (rising)
+[Flood Engine] Reading #18: 28.8 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #19: 29.7 cm (rising)
+[Flood Engine] Reading #19: 29.7 cm | Risk: SAFE
+[Broadcast] No active connections, skipping
+[Simulator] Reading #20: 30.2 cm (rising)
+[Flood Engine] Reading #20: 30.2 cm | Risk: WATCH
+[Simulator Loop] Broadcast 20 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #21: 30.5 cm (rising)
+[Flood Engine] Reading #21: 30.5 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #22: 31.1 cm (rising)
+[Flood Engine] Reading #22: 31.1 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #23: 31.4 cm (rising)
+[Flood Engine] Reading #23: 31.4 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #24: 32.3 cm (rising)
+[Flood Engine] Reading #24: 32.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #25: 32.6 cm (rising)
+[Flood Engine] Reading #25: 32.6 cm | Risk: WATCH
+[Simulator Loop] Broadcast 25 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #26: 32.9 cm (rising)
+[Flood Engine] Reading #26: 32.9 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #27: 33.4 cm (rising)
+[Flood Engine] Reading #27: 33.4 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #28: 34.0 cm (rising)
+[Flood Engine] Reading #28: 34.0 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #29: 34.3 cm (rising)
+[Flood Engine] Reading #29: 34.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #30: 34.9 cm (rising)
+[Flood Engine] Reading #30: 34.9 cm | Risk: WATCH
+[Simulator Loop] Broadcast 30 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #31: 35.3 cm (rising)
+[Flood Engine] Reading #31: 35.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #32: 36.2 cm (rising)
+[Flood Engine] Reading #32: 36.2 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #33: 36.3 cm (rising)
+[Flood Engine] Reading #33: 36.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #34: 36.9 cm (rising)
+[Flood Engine] Reading #34: 36.9 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #35: 37.2 cm (rising)
+[Flood Engine] Reading #35: 37.2 cm | Risk: WATCH
+[Simulator Loop] Broadcast 35 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #36: 38.2 cm (rising)
+[Flood Engine] Reading #36: 38.2 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #37: 38.3 cm (rising)
+[Flood Engine] Reading #37: 38.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #38: 38.9 cm (rising)
+[Flood Engine] Reading #38: 38.9 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #39: 39.8 cm (rising)
+[Flood Engine] Reading #39: 39.8 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #40: 39.8 cm (rising)
+[Flood Engine] Reading #40: 39.8 cm | Risk: WATCH
+[Simulator Loop] Broadcast 40 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #41: 40.6 cm (rising)
+[Flood Engine] Reading #41: 40.6 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #42: 41.2 cm (rising)
+[Flood Engine] Reading #42: 41.2 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #43: 41.3 cm (rising)
+[Flood Engine] Reading #43: 41.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+INFO:     127.0.0.1:51279 - "GET /api/status HTTP/1.1" 200 OK
+[Simulator] Reading #44: 41.8 cm (rising)
+[Flood Engine] Reading #44: 41.8 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #45: 42.7 cm (rising)
+[Flood Engine] Reading #45: 42.7 cm | Risk: WATCH
+[Simulator Loop] Broadcast 45 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #46: 43.1 cm (rising)
+[Flood Engine] Reading #46: 43.1 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #47: 43.6 cm (rising)
+[Flood Engine] Reading #47: 43.6 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #48: 43.9 cm (rising)
+[Flood Engine] Reading #48: 43.9 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #49: 44.8 cm (rising)
+[Flood Engine] Reading #49: 44.8 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #50: 44.8 cm (rising)
+[Flood Engine] Reading #50: 44.8 cm | Risk: WATCH
+[Simulator Loop] Broadcast 50 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #51: 45.5 cm (rising)
+[Flood Engine] Reading #51: 45.5 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #52: 45.7 cm (rising)
+[Flood Engine] Reading #52: 45.7 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #53: 46.4 cm (rising)
+[Flood Engine] Reading #53: 46.4 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #54: 46.8 cm (rising)
+[Flood Engine] Reading #54: 46.8 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #55: 47.7 cm (rising)
+[Flood Engine] Reading #55: 47.7 cm | Risk: WATCH
+[Simulator Loop] Broadcast 55 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #56: 48.2 cm (rising)
+[Flood Engine] Reading #56: 48.2 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #57: 48.3 cm (rising)
+[Flood Engine] Reading #57: 48.3 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #58: 49.2 cm (rising)
+[Flood Engine] Reading #58: 49.2 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #59: 49.5 cm (rising)
+[Flood Engine] Reading #59: 49.5 cm | Risk: WATCH
+[Broadcast] No active connections, skipping
+[Simulator] Reading #60: 49.8 cm (rising)
+[Flood Engine] Reading #60: 49.8 cm | Risk: WATCH
+[Simulator Loop] Broadcast 60 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #61: 50.6 cm (rising)
+[Flood Engine] Reading #61: 50.6 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #62: 50.7 cm (rising)
+[Flood Engine] Reading #62: 50.7 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #63: 51.3 cm (rising)
+[Flood Engine] Reading #63: 51.3 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #64: 51.9 cm (rising)
+[Flood Engine] Reading #64: 51.9 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #65: 52.5 cm (rising)
+[Flood Engine] Reading #65: 52.5 cm | Risk: WARNING
+[Simulator Loop] Broadcast 65 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #66: 53.2 cm (rising)
+[Flood Engine] Reading #66: 53.2 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #67: 53.7 cm (rising)
+[Flood Engine] Reading #67: 53.7 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #68: 54.1 cm (rising)
+[Flood Engine] Reading #68: 54.1 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #69: 54.7 cm (rising)
+[Flood Engine] Reading #69: 54.7 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #70: 55.2 cm (rising)
+[Flood Engine] Reading #70: 55.2 cm | Risk: WARNING
+[Simulator Loop] Broadcast 70 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #71: 55.4 cm (rising)
+[Flood Engine] Reading #71: 55.4 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #72: 56.0 cm (rising)
+[Flood Engine] Reading #72: 56.0 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #73: 56.4 cm (rising)
+[Flood Engine] Reading #73: 56.4 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #74: 56.7 cm (rising)
+[Flood Engine] Reading #74: 56.7 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #75: 57.4 cm (rising)
+[Flood Engine] Reading #75: 57.4 cm | Risk: WARNING
+[Simulator Loop] Broadcast 75 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #76: 57.7 cm (rising)
+[Flood Engine] Reading #76: 57.7 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #77: 58.8 cm (rising)
+[Flood Engine] Reading #77: 58.8 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #78: 58.8 cm (rising)
+[Flood Engine] Reading #78: 58.8 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #79: 59.5 cm (rising)
+[Flood Engine] Reading #79: 59.5 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #80: 59.8 cm (rising)
+[Flood Engine] Reading #80: 59.8 cm | Risk: WARNING
+[Simulator Loop] Broadcast 80 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #81: 60.4 cm (rising)
+[Flood Engine] Reading #81: 60.4 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #82: 60.8 cm (rising)
+[Flood Engine] Reading #82: 60.8 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #83: 61.8 cm (rising)
+[Flood Engine] Reading #83: 61.8 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #84: 62.2 cm (rising)
+[Flood Engine] Reading #84: 62.2 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #85: 62.7 cm (rising)
+[Flood Engine] Reading #85: 62.7 cm | Risk: WARNING
+[Simulator Loop] Broadcast 85 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #86: 62.9 cm (rising)
+[Flood Engine] Reading #86: 62.9 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #87: 63.3 cm (rising)
+[Flood Engine] Reading #87: 63.3 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #88: 64.1 cm (rising)
+[Flood Engine] Reading #88: 64.1 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #89: 64.6 cm (rising)
+[Flood Engine] Reading #89: 64.6 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #90: 65.1 cm (rising)
+[Flood Engine] Reading #90: 65.1 cm | Risk: WARNING
+[Simulator Loop] Broadcast 90 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #91: 65.8 cm (rising)
+[Flood Engine] Reading #91: 65.8 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #92: 66.1 cm (rising)
+[Flood Engine] Reading #92: 66.1 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #93: 66.6 cm (rising)
+[Flood Engine] Reading #93: 66.6 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #94: 67.2 cm (rising)
+[Flood Engine] Reading #94: 67.2 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #95: 67.6 cm (rising)
+[Flood Engine] Reading #95: 67.6 cm | Risk: WARNING
+[Simulator Loop] Broadcast 95 readings, 0 clients
+[Broadcast] No active connections, skipping
+[Simulator] Reading #96: 68.3 cm (rising)
+[Flood Engine] Reading #96: 68.3 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #97: 68.6 cm (rising)
+[Flood Engine] Reading #97: 68.6 cm | Risk: WARNING
+[Broadcast] No active connections, skipping
+[Simulator] Reading #98: 69.2 cm (rising)
+[Flood Engine] Reading #98: 69.2 cm | Risk: WARNING

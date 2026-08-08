@@ -1,5 +1,5 @@
 from models import WaterLevelReading, MonitoringNode, ProcessedReading, Alert, RiskLevel, DataSource
-from simulator import WaterLevelReading, AsyncWaterLevelSimulator, SimulatorConfig
+from simulator import WaterLevelSimulator, AsyncWaterLevelSimulator, SimulatorConfig
 from engine import CoreEngine, FloodEngine
 
 __all__ = [
@@ -9,6 +9,7 @@ __all__ = [
     "Alert",
     "RiskLevel",
     "DataSource",
+    "WaterLevelSimulator",
     "AsyncWaterLevelSimulator",
     "SimulatorConfig",
     "CoreEngine",

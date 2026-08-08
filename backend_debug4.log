@@ -1,0 +1,629 @@
+INFO:     Started server process [10096]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+==================================================
+HYDROSIGNAL - FLOOD EARLY WARNING SYSTEM
+==================================================
+Node: NODE-001 (Jakarta Basin A)
+Thresholds: {'watch': 30, 'warning': 50, 'critical': 70}
+WebSocket: ws://localhost:8000/ws
+REST API: http://localhost:8000/api
+==================================================
+[Simulator] Stopped. Total readings: 0
+INFO:     127.0.0.1:64552 - "POST /api/simulator/stop HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64557 - "WebSocket /ws" [accepted]
+INFO:     connection open
+[WS Endpoint] Accepting connection...
+[WebSocket] Client connected. Total: 1
+[WS Endpoint] Connection registered, active: 1
+INFO:     127.0.0.1:64558 - "POST /api/simulator/start HTTP/1.1" 200 OK
+[Sim Loop] Started, broadcasting to 1 clients
+[Simulator] Reading #1: 20.5 cm (rising)
+[Flood Engine] Reading #1: 20.5 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] Sending to 1 connections
+[Simulator] Reading #2: 20.9 cm (rising)
+[Flood Engine] Reading #2: 20.9 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] Sending to 1 connections
+[Simulator] Reading #3: 21.7 cm (rising)
+[Flood Engine] Reading #3: 21.7 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] Sending to 1 connections
+[Simulator] Reading #4: 22.2 cm (rising)
+[Flood Engine] Reading #4: 22.2 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] Sending to 1 connections
+[Simulator] Reading #5: 22.5 cm (rising)
+[Flood Engine] Reading #5: 22.5 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] Sending to 1 connections
+[WebSocket] Client disconnected. Total: 0
+[Simulator] Reading #6: 23.2 cm (rising)
+[Flood Engine] Reading #6: 23.2 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #7: 23.3 cm (rising)
+[Flood Engine] Reading #7: 23.3 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #8: 24.2 cm (rising)
+[Flood Engine] Reading #8: 24.2 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #9: 24.4 cm (rising)
+[Flood Engine] Reading #9: 24.4 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #10: 24.8 cm (rising)
+[Flood Engine] Reading #10: 24.8 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #11: 25.7 cm (rising)
+[Flood Engine] Reading #11: 25.7 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #12: 26.1 cm (rising)
+[Flood Engine] Reading #12: 26.1 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #13: 26.4 cm (rising)
+[Flood Engine] Reading #13: 26.4 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #14: 27.0 cm (rising)
+[Flood Engine] Reading #14: 27.0 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #15: 27.5 cm (rising)
+[Flood Engine] Reading #15: 27.5 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #16: 28.0 cm (rising)
+[Flood Engine] Reading #16: 28.0 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #17: 28.2 cm (rising)
+[Flood Engine] Reading #17: 28.2 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #18: 28.8 cm (rising)
+[Flood Engine] Reading #18: 28.8 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #19: 29.4 cm (rising)
+[Flood Engine] Reading #19: 29.4 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #20: 29.9 cm (rising)
+[Flood Engine] Reading #20: 29.9 cm | Risk: SAFE
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #21: 30.7 cm (rising)
+[Flood Engine] Reading #21: 30.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #22: 31.2 cm (rising)
+[Flood Engine] Reading #22: 31.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #23: 31.7 cm (rising)
+[Flood Engine] Reading #23: 31.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #24: 32.0 cm (rising)
+[Flood Engine] Reading #24: 32.0 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #25: 32.4 cm (rising)
+[Flood Engine] Reading #25: 32.4 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #26: 32.8 cm (rising)
+[Flood Engine] Reading #26: 32.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #27: 33.8 cm (rising)
+[Flood Engine] Reading #27: 33.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #28: 33.8 cm (rising)
+[Flood Engine] Reading #28: 33.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #29: 34.8 cm (rising)
+[Flood Engine] Reading #29: 34.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #30: 35.2 cm (rising)
+[Flood Engine] Reading #30: 35.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #31: 35.2 cm (rising)
+[Flood Engine] Reading #31: 35.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #32: 36.2 cm (rising)
+[Flood Engine] Reading #32: 36.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #33: 36.7 cm (rising)
+[Flood Engine] Reading #33: 36.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #34: 36.8 cm (rising)
+[Flood Engine] Reading #34: 36.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #35: 37.7 cm (rising)
+[Flood Engine] Reading #35: 37.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #36: 37.7 cm (rising)
+[Flood Engine] Reading #36: 37.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #37: 38.4 cm (rising)
+[Flood Engine] Reading #37: 38.4 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #38: 39.2 cm (rising)
+[Flood Engine] Reading #38: 39.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #39: 39.4 cm (rising)
+[Flood Engine] Reading #39: 39.4 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #40: 39.9 cm (rising)
+[Flood Engine] Reading #40: 39.9 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #41: 40.3 cm (rising)
+[Flood Engine] Reading #41: 40.3 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #42: 41.3 cm (rising)
+[Flood Engine] Reading #42: 41.3 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #43: 41.5 cm (rising)
+[Flood Engine] Reading #43: 41.5 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #44: 42.2 cm (rising)
+[Flood Engine] Reading #44: 42.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #45: 42.7 cm (rising)
+[Flood Engine] Reading #45: 42.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #46: 42.8 cm (rising)
+[Flood Engine] Reading #46: 42.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #47: 43.8 cm (rising)
+[Flood Engine] Reading #47: 43.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #48: 43.8 cm (rising)
+[Flood Engine] Reading #48: 43.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #49: 44.2 cm (rising)
+[Flood Engine] Reading #49: 44.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #50: 44.8 cm (rising)
+[Flood Engine] Reading #50: 44.8 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #51: 45.5 cm (rising)
+[Flood Engine] Reading #51: 45.5 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #52: 46.2 cm (rising)
+[Flood Engine] Reading #52: 46.2 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #53: 46.4 cm (rising)
+[Flood Engine] Reading #53: 46.4 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #54: 47.1 cm (rising)
+[Flood Engine] Reading #54: 47.1 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #55: 47.7 cm (rising)
+[Flood Engine] Reading #55: 47.7 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #56: 47.9 cm (rising)
+[Flood Engine] Reading #56: 47.9 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #57: 48.3 cm (rising)
+[Flood Engine] Reading #57: 48.3 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+INFO:     127.0.0.1:63397 - "GET /api/status HTTP/1.1" 200 OK
+[Simulator] Reading #58: 49.3 cm (rising)
+[Flood Engine] Reading #58: 49.3 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #59: 49.5 cm (rising)
+[Flood Engine] Reading #59: 49.5 cm | Risk: WATCH
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #60: 50.1 cm (rising)
+[Flood Engine] Reading #60: 50.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #61: 50.5 cm (rising)
+[Flood Engine] Reading #61: 50.5 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #62: 51.1 cm (rising)
+[Flood Engine] Reading #62: 51.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #63: 51.4 cm (rising)
+[Flood Engine] Reading #63: 51.4 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #64: 51.8 cm (rising)
+[Flood Engine] Reading #64: 51.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #65: 52.7 cm (rising)
+[Flood Engine] Reading #65: 52.7 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #66: 52.8 cm (rising)
+[Flood Engine] Reading #66: 52.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #67: 53.6 cm (rising)
+[Flood Engine] Reading #67: 53.6 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #68: 54.0 cm (rising)
+[Flood Engine] Reading #68: 54.0 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #69: 54.6 cm (rising)
+[Flood Engine] Reading #69: 54.6 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #70: 55.3 cm (rising)
+[Flood Engine] Reading #70: 55.3 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #71: 55.2 cm (rising)
+[Flood Engine] Reading #71: 55.2 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #72: 56.1 cm (rising)
+[Flood Engine] Reading #72: 56.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #73: 56.7 cm (rising)
+[Flood Engine] Reading #73: 56.7 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #74: 56.8 cm (rising)
+[Flood Engine] Reading #74: 56.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #75: 57.5 cm (rising)
+[Flood Engine] Reading #75: 57.5 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #76: 58.1 cm (rising)
+[Flood Engine] Reading #76: 58.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #77: 58.5 cm (rising)
+[Flood Engine] Reading #77: 58.5 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #78: 58.8 cm (rising)
+[Flood Engine] Reading #78: 58.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #79: 59.5 cm (rising)
+[Flood Engine] Reading #79: 59.5 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #80: 60.2 cm (rising)
+[Flood Engine] Reading #80: 60.2 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #81: 60.6 cm (rising)
+[Flood Engine] Reading #81: 60.6 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #82: 61.0 cm (rising)
+[Flood Engine] Reading #82: 61.0 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #83: 61.7 cm (rising)
+[Flood Engine] Reading #83: 61.7 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #84: 62.2 cm (rising)
+[Flood Engine] Reading #84: 62.2 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #85: 62.3 cm (rising)
+[Flood Engine] Reading #85: 62.3 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #86: 63.1 cm (rising)
+[Flood Engine] Reading #86: 63.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #87: 63.3 cm (rising)
+[Flood Engine] Reading #87: 63.3 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #88: 63.9 cm (rising)
+[Flood Engine] Reading #88: 63.9 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #89: 64.7 cm (rising)
+[Flood Engine] Reading #89: 64.7 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #90: 64.8 cm (rising)
+[Flood Engine] Reading #90: 64.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #91: 65.6 cm (rising)
+[Flood Engine] Reading #91: 65.6 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #92: 66.3 cm (rising)
+[Flood Engine] Reading #92: 66.3 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #93: 66.8 cm (rising)
+[Flood Engine] Reading #93: 66.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #94: 67.1 cm (rising)
+[Flood Engine] Reading #94: 67.1 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #95: 67.6 cm (rising)
+[Flood Engine] Reading #95: 67.6 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #96: 68.2 cm (rising)
+[Flood Engine] Reading #96: 68.2 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #97: 68.3 cm (rising)
+[Flood Engine] Reading #97: 68.3 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #98: 68.8 cm (rising)
+[Flood Engine] Reading #98: 68.8 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #99: 69.2 cm (rising)
+[Flood Engine] Reading #99: 69.2 cm | Risk: WARNING
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #100: 70.1 cm (rising)
+[Flood Engine] Reading #100: 70.1 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #101: 70.8 cm (rising)
+[Flood Engine] Reading #101: 70.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #102: 71.2 cm (rising)
+[Flood Engine] Reading #102: 71.2 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #103: 71.5 cm (rising)
+[Flood Engine] Reading #103: 71.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #104: 71.8 cm (rising)
+[Flood Engine] Reading #104: 71.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #105: 72.3 cm (rising)
+[Flood Engine] Reading #105: 72.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #106: 72.9 cm (rising)
+[Flood Engine] Reading #106: 72.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #107: 73.4 cm (rising)
+[Flood Engine] Reading #107: 73.4 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #108: 74.2 cm (rising)
+[Flood Engine] Reading #108: 74.2 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #109: 74.8 cm (rising)
+[Flood Engine] Reading #109: 74.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #110: 74.7 cm (rising)
+[Flood Engine] Reading #110: 74.7 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #111: 75.6 cm (rising)
+[Flood Engine] Reading #111: 75.6 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #112: 76.0 cm (rising)
+[Flood Engine] Reading #112: 76.0 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #113: 76.5 cm (rising)
+[Flood Engine] Reading #113: 76.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #114: 77.3 cm (rising)
+[Flood Engine] Reading #114: 77.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #115: 77.3 cm (rising)
+[Flood Engine] Reading #115: 77.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #116: 77.8 cm (rising)
+[Flood Engine] Reading #116: 77.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #117: 78.5 cm (rising)
+[Flood Engine] Reading #117: 78.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #118: 78.8 cm (rising)
+[Flood Engine] Reading #118: 78.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #119: 79.7 cm (rising)
+[Flood Engine] Reading #119: 79.7 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #120: 79.8 cm (rising)
+[Flood Engine] Reading #120: 79.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #121: 80.3 cm (rising)
+[Flood Engine] Reading #121: 80.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #122: 81.1 cm (rising)
+[Flood Engine] Reading #122: 81.1 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #123: 81.4 cm (rising)
+[Flood Engine] Reading #123: 81.4 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #124: 81.9 cm (rising)
+[Flood Engine] Reading #124: 81.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #125: 82.5 cm (rising)
+[Flood Engine] Reading #125: 82.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #126: 83.2 cm (rising)
+[Flood Engine] Reading #126: 83.2 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #127: 83.6 cm (rising)
+[Flood Engine] Reading #127: 83.6 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #128: 84.0 cm (rising)
+[Flood Engine] Reading #128: 84.0 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #129: 84.3 cm (rising)
+[Flood Engine] Reading #129: 84.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #130: 84.8 cm (rising)
+[Flood Engine] Reading #130: 84.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #131: 85.3 cm (rising)
+[Flood Engine] Reading #131: 85.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #132: 86.3 cm (rising)
+[Flood Engine] Reading #132: 86.3 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #133: 86.5 cm (rising)
+[Flood Engine] Reading #133: 86.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #134: 86.9 cm (rising)
+[Flood Engine] Reading #134: 86.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #135: 87.4 cm (rising)
+[Flood Engine] Reading #135: 87.4 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #136: 87.8 cm (rising)
+[Flood Engine] Reading #136: 87.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #137: 88.2 cm (rising)
+[Flood Engine] Reading #137: 88.2 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #138: 88.9 cm (rising)
+[Flood Engine] Reading #138: 88.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #139: 89.8 cm (rising)
+[Flood Engine] Reading #139: 89.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #140: 89.9 cm (rising)
+[Flood Engine] Reading #140: 89.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #141: 90.6 cm (rising)
+[Flood Engine] Reading #141: 90.6 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #142: 90.7 cm (rising)
+[Flood Engine] Reading #142: 90.7 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #143: 91.7 cm (rising)
+[Flood Engine] Reading #143: 91.7 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #144: 92.0 cm (rising)
+[Flood Engine] Reading #144: 92.0 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #145: 92.4 cm (rising)
+[Flood Engine] Reading #145: 92.4 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #146: 92.8 cm (rising)
+[Flood Engine] Reading #146: 92.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #147: 93.6 cm (rising)
+[Flood Engine] Reading #147: 93.6 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #148: 93.9 cm (rising)
+[Flood Engine] Reading #148: 93.9 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #149: 94.5 cm (rising)
+[Flood Engine] Reading #149: 94.5 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #150: 94.8 cm (rising)
+[Flood Engine] Reading #150: 94.8 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #151: 95.6 cm (rising)
+[Flood Engine] Reading #151: 95.6 cm | Risk: CRITICAL
+[Sim Loop] Processing reading
+[Broadcast] No active connections, skipping
+[Simulator] Reading #152: 95.9 cm (rising)
+[Flood Engine] Reading #152: 95.9 cm | Risk: CRITICAL

@@ -1,8 +1,7 @@
-import time
 import random
 import math
 from typing import Callable, List, Dict, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from models import WaterLevelReading, DataSource
@@ -19,7 +18,6 @@ class SimulatorConfig:
 
 
 class WaterLevelSimulator:
-
     PRESETS: Dict[str, Dict] = {
         "demo": {
             "start_level": 20,
@@ -49,6 +47,7 @@ class WaterLevelSimulator:
 
     def __init__(self, config: Optional[SimulatorConfig] = None):
         self.config = config or SimulatorConfig()
+
         self.node_id = self.config.node_id
         self.interval_ms = self.config.interval_ms
         self.mode = self.config.mode
@@ -74,12 +73,14 @@ class WaterLevelSimulator:
             )
 
         preset = self.PRESETS[preset_name]
+
         self.start_level = preset["start_level"]
         self.current_level = preset["start_level"]
         self.rise_rate = preset["rise_rate"]
         self.noise = preset["noise"]
         self.interval_ms = preset["interval_ms"]
         self.mode = preset_name
+
         print(f"[Simulator] Using preset: {preset_name}")
 
     def set_mode(self, mode: str) -> None:
@@ -104,6 +105,7 @@ class WaterLevelSimulator:
         print(f"[Simulator] Starting with mode: {self.mode}")
         print(f"[Simulator] Interval: {self.interval_ms}ms")
         print(f"[Simulator] Starting level: {self.start_level} cm")
+
         self._running = True
         self.current_level = self.start_level
 
@@ -115,9 +117,14 @@ class WaterLevelSimulator:
             return
 
         self._running = False
-        print(f"[Simulator] Stopped. Total readings: {self._reading_count}")
+        print(
+            f"[Simulator] Stopped. "
+            f"Total readings: {self._reading_count}"
+        )
 
-    def _generate_reading(self) -> Optional[WaterLevelReading]:
+    def _generate_reading(
+        self
+    ) -> Optional[WaterLevelReading]:
         if not self._running:
             return None
 
@@ -125,8 +132,16 @@ class WaterLevelSimulator:
 
         self.current_level = self._calculate_next_level()
 
-        noise_offset = (random.random() - 0.5) * self.noise * 2
-        final_level = max(0, self.current_level + noise_offset)
+        noise_offset = (
+            (random.random() - 0.5)
+            * self.noise
+            * 2
+        )
+
+        final_level = max(
+            0,
+            self.current_level + noise_offset
+        )
 
         rounded_level = round(final_level, 1)
 
@@ -137,7 +152,11 @@ class WaterLevelSimulator:
             source=DataSource.SIMULATOR
         )
 
-        print(f"[Simulator] Reading #{self._reading_count}: {rounded_level} cm ({self.mode})")
+        print(
+            f"[Simulator] Reading "
+            f"#{self._reading_count}: "
+            f"{rounded_level} cm ({self.mode})"
+        )
 
         self._emit(reading)
 
@@ -148,41 +167,75 @@ class WaterLevelSimulator:
             return self.current_level + self.rise_rate
 
         elif self.mode == "falling":
-            return max(0, self.current_level - self.rise_rate)
+            return max(
+                0,
+                self.current_level - self.rise_rate
+            )
 
         elif self.mode == "stable":
-            drift = (random.random() - 0.5) * 0.2
+            drift = (
+                (random.random() - 0.5)
+                * 0.2
+            )
+
             return self.current_level + drift
 
         elif self.mode == "fluctuating":
-            wave = math.sin(self._reading_count * 0.3) * 1.5
-            return self.start_level + wave + (random.random() - 0.5) * self.noise
+            wave = (
+                math.sin(
+                    self._reading_count * 0.3
+                )
+                * 1.5
+            )
+
+            return (
+                self.start_level
+                + wave
+                + (random.random() - 0.5)
+                * self.noise
+            )
 
         elif self.mode == "rapid":
             return self.current_level + self.rise_rate
 
         elif self.mode == "emergency":
-            return self.current_level + self.rise_rate * 2
+            return (
+                self.current_level
+                + self.rise_rate * 2
+            )
 
-        else:
-            return self.current_level + self.rise_rate
+        return self.current_level + self.rise_rate
 
-    def inject_level(self, level: float) -> WaterLevelReading:
+    def inject_level(
+        self,
+        level: float
+    ) -> WaterLevelReading:
         self.current_level = level
+
         reading = WaterLevelReading(
             node_id=self.node_id,
             water_level=level,
             timestamp=datetime.now(),
             source=DataSource.SIMULATOR
         )
-        print(f"[Simulator] Injected level: {level} cm")
+
+        print(
+            f"[Simulator] Injected level: "
+            f"{level} cm"
+        )
+
         self._emit(reading)
+
         return reading
 
     def reset(self) -> None:
         self.current_level = self.start_level
         self._reading_count = 0
-        print(f"[Simulator] Reset to {self.start_level} cm")
+
+        print(
+            f"[Simulator] Reset to "
+            f"{self.start_level} cm"
+        )
 
     def get_stats(self) -> Dict:
         return {
@@ -194,9 +247,13 @@ class WaterLevelSimulator:
         }
 
 
-class AsyncWaterLevelSimulator(WaterLevelSimulator):
-
-    def __init__(self, config: Optional[SimulatorConfig] = None):
+class AsyncWaterLevelSimulator(
+    WaterLevelSimulator
+):
+    def __init__(
+        self,
+        config: Optional[SimulatorConfig] = None
+    ):
         super().__init__(config)
         self._task = None
 
@@ -207,19 +264,38 @@ class AsyncWaterLevelSimulator(WaterLevelSimulator):
             print("[Simulator] Already running")
             return
 
-        print(f"[Simulator] Starting async with mode: {self.mode}")
-        print(f"[Simulator] Interval: {self.interval_ms}ms")
-        print(f"[Simulator] Starting level: {self.start_level} cm")
+        print(
+            f"[Simulator] Starting async "
+            f"with mode: {self.mode}"
+        )
+
+        print(
+            f"[Simulator] Interval: "
+            f"{self.interval_ms}ms"
+        )
+
+        print(
+            f"[Simulator] Starting level: "
+            f"{self.start_level} cm"
+        )
+
         self._running = True
         self.current_level = self.start_level
 
         self._generate_reading()
 
         while self._running:
-            await asyncio.sleep(self.interval_ms / 1000)
+            await asyncio.sleep(
+                self.interval_ms / 1000
+            )
+
             if self._running:
                 self._generate_reading()
 
     def stop(self) -> None:
         self._running = False
-        print(f"[Simulator] Stopped. Total readings: {self._reading_count}")
+
+        print(
+            f"[Simulator] Stopped. "
+            f"Total readings: {self._reading_count}"
+        )
