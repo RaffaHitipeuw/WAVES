@@ -100,13 +100,14 @@ class CoreEngine:
 
         # Confidence: use CV pipeline value if available (video mode),
         # otherwise derive from buffer fill (simulator mode).
-        # Simulator cap at 0.8 — buffer fill is internal consistency,
-        # not evidential reliability about external truth.
+        # Simulator cap at 0.5 — synthetic data has inherent uncertainty.
+        # Buffer fill measures internal consistency, not external reliability.
+        # Even after 10 readings, simulator confidence should stay below real CV.
         if cv_confidence is not None:
             self.state.confidence = round(cv_confidence, 3)
         else:
             buf_size = len(self.reading_buffer)
-            self.state.confidence = round(min(buf_size / 10.0, 0.8), 3)
+            self.state.confidence = round(min(buf_size / 10.0, 0.5), 3)
 
         result = {
             "reading": reading.to_dict(),

@@ -29,7 +29,8 @@ import {
   Video,
   ActivitySquare,
   AlertOctagon,
-  Bug
+  Bug,
+  Crosshair,
 } from 'lucide-react'
 import { useFloodWebSocket } from './hooks/useFloodWebSocket'
 import { CVDebugPanel, VideoOverlay } from './components/CVDebugPanel'
@@ -40,6 +41,7 @@ const API_BASE = 'http://localhost:8000'
 const RISK_CONFIG = {
   SAFE: {
     color: 'text-risk-safe',
+    colorHex: '#22c55e',
     bgColor: 'bg-risk-safe/10 border-risk-safe/30',
     label: 'SAFE',
     message: 'Water level is within normal parameters.',
@@ -47,6 +49,7 @@ const RISK_CONFIG = {
   },
   WATCH: {
     color: 'text-risk-watch',
+    colorHex: '#f59e0b',
     bgColor: 'bg-risk-watch/10 border-risk-watch/30',
     label: 'WATCH',
     message: 'Water level is elevated. Monitoring intensified.',
@@ -54,6 +57,7 @@ const RISK_CONFIG = {
   },
   WARNING: {
     color: 'text-risk-warning',
+    colorHex: '#f97316',
     bgColor: 'bg-risk-warning/10 border-risk-warning/30',
     label: 'WARNING',
     message: 'Rapid water-level increase detected. Prepare for flooding.',
@@ -61,6 +65,7 @@ const RISK_CONFIG = {
   },
   CRITICAL: {
     color: 'text-risk-critical',
+    colorHex: '#ef4444',
     bgColor: 'bg-risk-critical/10 border-risk-critical/30',
     label: 'CRITICAL',
     message: 'Critical water level. Immediate action required.',
@@ -145,6 +150,9 @@ function StatusBar({ status, nodeId, mode, progress, debugMode, onToggleDebug, v
 function VideoMonitor({ videoRef, measurement, isPlaying, mode, overlays, wsData }) {
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
   const StatusIcon = statusConfig.icon
+  // Video is 1920x1080 — pass to overlay so SVG viewBox scales correctly
+  const VIDEO_W = 1920
+  const VIDEO_H = 1080
 
   return (
     <div className="video-monitor" style={{ position: 'relative' }}>
@@ -156,7 +164,7 @@ function VideoMonitor({ videoRef, measurement, isPlaying, mode, overlays, wsData
         muted
         playsInline
       />
-      <VideoOverlay data={wsData} overlays={overlays} />
+      <VideoOverlay data={wsData} overlays={overlays} frameWidth={VIDEO_W} frameHeight={VIDEO_H} />
       <div className="video-overlay" />
       <div className="video-timestamp">
         <div className="video-timestamp-badge">
@@ -228,43 +236,126 @@ function PrimaryDisplay({ measurement, absoluteDepthStatus, measurementValidity 
   const riskConfig = RISK_CONFIG[risk] || RISK_CONFIG.SAFE
   const waterLevel = measurement?.waterLevel
   const isValid = measurement?.isValid !== false
+  const rateOfChange = measurement?.rateOfChange
+  const predictedLevel5min = measurement?.predictedLevel5min
+  const measurementConfidence = measurement?.measurement_confidence ?? measurement?.confidence ?? 0
+  const trend = measurement?.trend || 'UNKNOWN'
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
   const StatusIcon = statusConfig.icon
 
-  // Depth trust indicator
+  // Depth trust
   const depthColors = {
     'TRUSTED': { color: 'text-risk-safe', bg: 'bg-risk-safe', label: 'Trusted' },
     'APPROXIMATE': { color: 'text-risk-watch', bg: 'bg-risk-watch', label: 'Approx.' },
     'UNAVAILABLE': { color: 'text-text-muted', bg: 'bg-text-muted', label: 'No Depth' },
+    'SIMULATOR': { color: 'text-text-muted', bg: 'bg-text-muted', label: 'Simulator' },
     'UNKNOWN': { color: 'text-text-muted', bg: 'bg-text-muted', label: 'Unknown' },
   }
   const depthInfo = depthColors[absoluteDepthStatus] || depthColors.UNKNOWN
 
+  // Trend display
+  const trendSymbols = {
+    'RISING': '↑', 'RISING_FAST': '↑↑', 'FALLING': '↓',
+    'FALLING_FAST': '↓↓', 'STABLE': '→', 'UNKNOWN': '?'
+  }
+  const trendColor = {
+    'RISING': 'text-risk-warning', 'RISING_FAST': 'text-risk-critical',
+    'FALLING': 'text-risk-safe', 'FALLING_FAST': 'text-risk-safe',
+    'STABLE': 'text-text-secondary', 'UNKNOWN': 'text-text-muted'
+  }
+
+  // Confidence bar color
+  const confColor = measurementConfidence >= 0.7 ? 'safe'
+    : measurementConfidence >= 0.4 ? 'warning' : 'low'
+
+  if (!isValid) {
+    return (
+      <div className="primary-display" style={{ borderLeft: `3px solid var(--color-risk-safe)` }}>
+        <div className="primary-label text-risk-safe font-bold text-lg mb-2">
+          NO DETECTION
+        </div>
+        <div className="text-text-muted text-sm">
+          {measurement?.measurementStatus?.replace(/_/g, ' ') || 'Waiting for sensor'}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="primary-display">
-      <div className="primary-label">
-        Current Water Level
-        <span className={`ml-2 text-[9px] px-1.5 py-0.5 rounded border ${depthInfo.color} border-current opacity-70`}>
+    <div className="primary-display" style={{ borderLeft: `3px solid ${riskConfig.colorHex}` }}>
+      {/* RISK — large prominent header */}
+      <div className={`text-3xl font-black uppercase tracking-wider ${riskConfig.color} mb-4`}>
+        {risk === 'SAFE' ? '✓ SAFE' : risk === 'WATCH' ? '⚠ WATCH' : risk === 'WARNING' ? '⚡ WARNING' : '🔴 CRITICAL'}
+      </div>
+
+      {/* Water Level */}
+      <div className="flex items-baseline justify-between mb-3">
+        <div>
+          <div className="text-xs text-text-muted mb-1">Current Water Level</div>
+          <div className={`text-4xl font-bold ${riskConfig.color}`}>
+            {waterLevel != null ? formatNumber(waterLevel) : '--'}
+            <span className="text-lg font-normal text-text-secondary ml-1">cm</span>
+          </div>
+        </div>
+        <span className={`text-[9px] px-1.5 py-0.5 rounded border ${depthInfo.color} border-current opacity-70`}>
           {depthInfo.label}
         </span>
       </div>
-      <div className="primary-value-container">
-        <span className={`primary-value ${!isValid ? 'text-text-muted' : riskConfig.color}`}>
-          {isValid ? formatNumber(waterLevel) : '--'}
-        </span>
-        <span className="primary-unit">cm</span>
-      </div>
+
+      {/* Rate of Change */}
+      {rateOfChange != null && (
+        <div className="flex items-center gap-2 mb-3 text-sm">
+          <span className={riskConfig.color}>
+            {trendSymbols[trend] || '?'}
+          </span>
+          <span className={`font-medium ${rateOfChange >= 0 ? 'text-risk-warning' : 'text-risk-safe'}`}>
+            {rateOfChange >= 0 ? '+' : ''}{formatNumber(rateOfChange)} cm/min
+          </span>
+          <span className={`text-xs ${trendColor[trend] || 'text-text-muted'}`}>
+            {trend.replace(/_/g, ' ')}
+          </span>
+        </div>
+      )}
+
+      {/* Forecast */}
+      {predictedLevel5min != null && (
+        <div className="mb-3 p-2 rounded" style={{ background: 'var(--color-bg-secondary)' }}>
+          <div className="text-xs text-text-muted mb-1">Forecast +5 min</div>
+          <div className={`text-xl font-bold ${predictedLevel5min >= 50 ? 'text-risk-critical' : predictedLevel5min >= 30 ? 'text-risk-warning' : 'text-accent-cyan'}`}>
+            {formatNumber(predictedLevel5min)} cm
+          </div>
+        </div>
+      )}
+
+      {/* Measurement Validity */}
       {measurementValidity && measurementValidity !== 'VALID' && (
-        <div className="mt-2 text-xs text-risk-watch">
+        <div className="text-xs text-risk-watch mb-2">
           {measurementValidity.replace(/_/g, ' ')}
         </div>
       )}
-      {!isValid && (
-        <div className={`mt-3 flex items-center justify-center gap-2 ${statusConfig.color}`}>
-          <StatusIcon size={14} />
-          <span className="text-xs">{measurement?.measurementStatus?.replace(/_/g, ' ')}</span>
+
+      {/* Confidence — small thin bar at bottom */}
+      <div className="mt-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-text-muted">Detection confidence</span>
+          <span className="text-xs text-text-secondary font-medium">
+            {Math.round(measurementConfidence * 100)}%
+          </span>
         </div>
-      )}
+        <div className="confidence-bar">
+          <div
+            className={`confidence-fill ${confColor}`}
+            style={{
+              width: `${Math.round(measurementConfidence * 100)}%`,
+              background: confColor === 'safe'
+                ? `linear-gradient(90deg, var(--color-accent-cyan) 0%, var(--color-accent-cyan) 100%)`
+                : confColor === 'warning'
+                ? `linear-gradient(90deg, var(--color-risk-warning) 0%, var(--color-risk-warning) 100%)`
+                : `linear-gradient(90deg, var(--color-risk-critical) 0%, var(--color-risk-critical) 100%)`
+            }}
+          />
+        </div>
+      </div>
     </div>
   )
 }
@@ -363,6 +454,77 @@ function RateOfRisePanel({ measurement, history }) {
           <div className={`rate-trend ${trendColor} mt-1`}>{trend.replace(/_/g, ' ')}</div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function PredictionPanel({ measurement }) {
+  // P2 FIX: This is real prediction — ETA to thresholds + projected level.
+  // Previously "Predicted Water Level" was just the current measurement with a
+  // dramatic label. Now it shows actual forecast data.
+  const predictedLevel = measurement?.predictedLevel5min
+  const etaWarning = measurement?.etaToWarning
+  const etaCritical = measurement?.etaToCritical
+  const hasPrediction = predictedLevel != null || etaWarning != null || etaCritical != null
+
+  if (!hasPrediction) {
+    return (
+      <div className="rate-panel">
+        <div className="panel-title mb-3">
+          <TrendingUp size={12} />
+          5-Min Forecast
+        </div>
+        <div className="text-sm text-text-muted">
+          Prediction unavailable — requires stable rate
+        </div>
+      </div>
+    )
+  }
+
+  const formatEta = (eta) => {
+    if (eta === null || eta === undefined) return '—'
+    if (eta === 0) return 'NOW'
+    if (eta < 1) return `${Math.round(eta * 60)}s`
+    return `${Math.round(eta)} min`
+  }
+
+  const etaWarningColor = etaWarning != null && etaWarning <= 5 ? 'text-risk-critical' : etaWarning != null ? 'text-risk-warning' : 'text-text-muted'
+  const etaCriticalColor = etaCritical != null && etaCritical <= 10 ? 'text-risk-critical' : etaCritical != null ? 'text-risk-warning' : 'text-text-muted'
+
+  return (
+    <div className="rate-panel">
+      <div className="panel-title mb-3">
+        <TrendingUp size={12} />
+        5-Min Forecast
+      </div>
+      {predictedLevel != null && (
+        <div className="mb-3">
+          <div className="text-xs text-text-muted mb-1">Projected Level (+5 min)</div>
+          <div className="text-2xl font-bold text-accent-cyan">
+            {predictedLevel >= 0 ? '+' : ''}{predictedLevel}
+            <span className="text-sm font-normal text-text-muted ml-1">cm</span>
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <div className="text-xs text-text-muted mb-1">ETA → Warning</div>
+          <div className={`text-lg font-semibold ${etaWarningColor}`}>
+            {formatEta(etaWarning)}
+          </div>
+        </div>
+        <div>
+          <div className="text-xs text-text-muted mb-1">ETA → Critical</div>
+          <div className={`text-lg font-semibold ${etaCriticalColor}`}>
+            {formatEta(etaCritical)}
+          </div>
+        </div>
+      </div>
+      {etaWarning != null && etaWarning <= 5 && (
+        <div className="mt-2 text-xs text-risk-critical font-medium">
+          ⚠ Imminent threshold breach
+        </div>
+      )}
     </div>
   )
 }
@@ -523,7 +685,7 @@ function RiskAlert({ measurement, data }) {
   )
 }
 
-function Controls({ onStart, onStop, onReset, onModeChange, isRunning, mode, onVideoSelect }) {
+function Controls({ onStart, onStop, onReset, onModeChange, onSetBaseline, isRunning, mode, currentDetectedY, calibrationStatus }) {
   return (
     <div className="controls-panel">
       <div className="panel-title mb-3">
@@ -557,8 +719,24 @@ function Controls({ onStart, onStop, onReset, onModeChange, isRunning, mode, onV
         </select>
       </div>
       {mode === 'video' && (
-        <div className="mt-3 text-xs text-text-muted">
-          Using computer vision pipeline on video frames
+        <div className="mt-3">
+          <div className="text-xs text-text-muted mb-2">
+            CV calibration: <span className={calibrationStatus === 'BASELINE_ESTABLISHED' || calibrationStatus === 'CALIBRATED' ? 'text-risk-safe' : 'text-risk-watch'}>
+              {calibrationStatus || 'Establishing...'}
+            </span>
+          </div>
+          <button
+            onClick={onSetBaseline}
+            className="btn btn-secondary w-full text-xs"
+            disabled={!currentDetectedY}
+            title="Set current pixel position as dry reference baseline"
+          >
+            <Crosshair size={12} />
+            Set Baseline (Y={currentDetectedY || '—'})
+          </button>
+          <div className="text-xs text-text-muted mt-1">
+            Capture current position as dry reference
+          </div>
         </div>
       )}
       {mode === 'simulator' && (
@@ -623,6 +801,9 @@ function App() {
   // Fallback to engine's processed rate (cm/min).
   const physicalRate = data?.rateCmPerMin ?? processed.rateOfChange ?? state.rateOfChange ?? null
 
+  // Extract prediction data from pipeline result
+  const prediction = data?.prediction || null
+
   const frontendMeasurement = measurement ? {
     ...measurement,
     // Use pipeline's physical rate (cm/min) as authoritative source
@@ -632,6 +813,10 @@ function App() {
     trend: temporalData.trend || measurement.trend || 'UNKNOWN',
     // Physical rate in px/s for diagnostics
     ratePxPerSec: temporalData.rate_px_per_sec,
+    // Prediction fields
+    predictedLevel5min: prediction?.predictedLevel5min,
+    etaToWarning: prediction?.etaToWarning,
+    etaToCritical: prediction?.etaToCritical,
   } : {
     waterLevel: processed.rawWaterLevel ?? state.waterLevel ?? 0,
     smoothedLevel: processed.smoothedWaterLevel ?? state.smoothedLevel ?? 0,
@@ -738,6 +923,28 @@ function App() {
     setMode(newMode)
   }
 
+  const handleSetBaseline = async () => {
+    // Get current detected Y from the live data
+    const detectedY = data?.detection?.waterline_y
+    if (!detectedY) {
+      console.warn('No detected Y available for baseline')
+      return
+    }
+    try {
+      const response = await fetch(`${API_BASE}/api/calibration/baseline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pixel_y: Math.round(detectedY) }),
+      })
+      const result = await response.json()
+      console.log('Baseline set:', result)
+      // Trigger a reset to apply the new baseline
+      await fetch(`${API_BASE}/api/reset`, { method: 'POST' })
+    } catch (err) {
+      console.error('Set baseline error:', err)
+    }
+  }
+
   const handleTogglePause = () => setIsPaused(p => !p)
   const handleStep = () => {}
   const handleToggleOverlay = (key) => {
@@ -804,7 +1011,10 @@ function App() {
           <WaterLevelChart history={history} measurement={frontendMeasurement} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <PredictionPanel measurement={frontendMeasurement} />
           <RateOfRisePanel measurement={frontendMeasurement} history={history} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <SystemStatus measurement={frontendMeasurement} data={data} mode={systemMode} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
@@ -813,8 +1023,11 @@ function App() {
             onStop={handleStop}
             onReset={handleReset}
             onModeChange={handleModeChange}
+            onSetBaseline={handleSetBaseline}
             isRunning={isRunning}
             mode={mode}
+            currentDetectedY={data?.detection?.waterline_y}
+            calibrationStatus={data?.diagnostics?.absolute_depth_status}
           />
           <Thresholds />
         </div>

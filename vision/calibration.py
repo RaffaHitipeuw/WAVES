@@ -57,6 +57,7 @@ class CalibrationModel:
             result.update({
                 'waterLevel': round(water_level, 2),
                 'relativeLevel': None,
+                'pixelsPerCm': self.config.pixels_per_cm,
                 'calibrationMethod': 'absolute',
                 'confidence': 0.8,
                 'calibrated': True
@@ -79,6 +80,7 @@ class CalibrationModel:
                 result.update({
                     'waterLevel': 0.0,
                     'relativeLevel': 0.0,
+                    'pixelsPerCm': getattr(self.config, 'pixels_per_cm', None) or 10.0,
                     'calibrationMethod': 'relative_baseline',
                     'baselineY': self._baseline_y,
                     'confidence': 0.7,
@@ -96,10 +98,15 @@ class CalibrationModel:
                 return result
         delta_y = self._baseline_y - waterline_y
         relative_level = delta_y
-        estimated_cm = relative_level / 10.0
+        # P2 FIX: Set pixelsPerCm so pipeline can convert px/s → cm/min for rate.
+        # For relative calibration this is an ASSUMPTION (10 px/cm), not a measurement.
+        # The caller (pipeline) marks this as APPROXIMATE via absolute_depth_status.
+        pixels_per_cm = getattr(self.config, 'pixels_per_cm', None) or 10.0
+        estimated_cm = relative_level / pixels_per_cm
         result.update({
             'waterLevel': round(estimated_cm, 2),
             'relativeLevel': round(delta_y, 1),
+            'pixelsPerCm': pixels_per_cm,   # enables rate conversion
             'calibrationMethod': 'relative',
             'baselineY': self._baseline_y,
             'currentY': waterline_y,

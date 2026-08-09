@@ -1,4 +1,5 @@
 import cv2
+import time
 import numpy as np
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
@@ -70,8 +71,12 @@ class CVPipeline:
         if self._start_time is None:
             self._start_time = self._frame_count
 
-        current_frame = frame_index or self._frame_count
-        timestamp = current_frame / 30.0
+        current_frame = frame_index if frame_index is not None else self._frame_count
+        # Use wall-clock time so temporal rate calculations reflect actual elapsed time.
+        # Previously used current_frame/30.0 which assumed 30 FPS — broken when the
+        # caller processes at a different rate (e.g. 1 FPS in video mode or
+        # simulator interval in simulator mode).
+        timestamp = time.time()
 
         detection_result = self.detector.detect(frame)
 
@@ -170,6 +175,40 @@ class CVPipeline:
             measurement_result, temporal_state, calibration_result, rate_cm_per_min
         )
 
+        # P2 FIX: Compute actual prediction fields.
+        # "Predicted Water Level" label was a lie — this is real prediction.
+        # ETA to thresholds + predicted level at 5-minute horizon.
+        prediction = None
+        if (measurement_result.is_valid and measurement_result.water_level is not None
+                and rate_cm_per_min is not None and abs(rate_cm_per_min) > 0.01):
+            level = measurement_result.water_level
+            rate = rate_cm_per_min  # cm/min
+            HORIZON_MIN = 5.0  # 5-minute forecast window
+            WATCH_THRESH = 30.0
+            WARNING_THRESH = 50.0
+            CRITICAL_THRESH = 70.0
+
+            # Projected level at HORIZON_MIN minutes
+            predicted_level_5min = round(level + rate * HORIZON_MIN, 1)
+
+            # ETA to each threshold (minutes). Positive rate = rising toward threshold.
+            # Returns None if already above threshold or rate won't reach it.
+            def eta_to(threshold):
+                if rate <= 0:
+                    return None  # not rising toward threshold
+                if level >= threshold:
+                    return 0.0   # already at/above threshold
+                return round((threshold - level) / rate, 1)
+
+            prediction = {
+                'predictedLevel5min': predicted_level_5min,
+                'etaToWatch': eta_to(WATCH_THRESH),
+                'etaToWarning': eta_to(WARNING_THRESH),
+                'etaToCritical': eta_to(CRITICAL_THRESH),
+                'rateCmPerMin': rate,
+                'horizonMin': HORIZON_MIN,
+            }
+
         evidence = self._calculate_evidence(
             detection_result, temporal_state, calibration_result
         )
@@ -239,7 +278,8 @@ class CVPipeline:
             'risk_confidence': risk_confidence,
             'diagnostics': diagnostics,
             'evidence': evidence,
-            'signals': signals
+            'signals': signals,
+            'prediction': prediction,
         }
 
     def _calibration_quality(

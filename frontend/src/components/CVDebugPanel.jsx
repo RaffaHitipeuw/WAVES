@@ -312,15 +312,31 @@ export function FrameControls({ isPaused, onStep, onReset, onTogglePause, overla
 }
 
 export function VideoOverlay({ data, overlays, frameWidth, frameHeight }) {
+  // frameWidth/frameHeight are the ORIGINAL video dimensions (1920x1080).
+  // The SVG must be positioned absolutely over the video, and Y coordinates
+  // scaled to the actual displayed video size. If dimensions are unknown,
+  // assume 16:9 (1920x1080) and let the SVG scale naturally.
+  const videoW = frameWidth || 1920
+  const videoH = frameHeight || 1080
   const { detection, candidates, signals } = data || {}
   const roi = signals?.roi
   const lines = []
+
   if (overlays.waterline && detection?.waterline_y) {
     const y = detection.waterline_y
-    lines.push({ type: 'waterline', y, color: '#22d3ee', label: `WL ${y.toFixed(1)}px` })
+    const raw_signal = detection?.raw_signal || {}
+    const spread = raw_signal?.cross_method_spread
+    const agreement = raw_signal?.agreement_bonus
+    // Color: cyan if agreement, orange if disagreement, red if locked
+    const isLocked = spread !== undefined && spread <= 5
+    const isDisagree = spread !== undefined && spread >= 50
+    const lineColor = isLocked ? '#ef4444' : isDisagree ? '#f97316' : '#22d3ee'
+    const label = `WL ${Math.round(y)}px`
+    lines.push({ type: 'waterline', y, color: lineColor, label })
   }
+
   if (overlays.candidates && candidates?.length > 0) {
-    candidates.forEach((c, i) => {
+    candidates.forEach((c) => {
       lines.push({
         type: 'candidate',
         y: c.waterline_y,
@@ -329,23 +345,27 @@ export function VideoOverlay({ data, overlays, frameWidth, frameHeight }) {
       })
     })
   }
+
   if (overlays.roi && roi) {
     lines.push({
       type: 'roi',
       x1: roi.x_min, y1: roi.y_min,
       x2: roi.x_max, y2: roi.y_max,
       color: '#a78bfa',
-      label: `ROI [${roi.x_min},${roi.y_min}]-${roi.x_max},${roi.y_max}`
+      label: `ROI ${roi.x_min},${roi.y_min}–${roi.x_max},${roi.y_max}`
     })
   }
+
   if (lines.length === 0) return null
-  const svgW = frameWidth || 320
-  const svgH = frameHeight || 200
+
+  // Overlay fills the entire video monitor container (position: absolute parent).
+  // SVG viewBox matches original video dimensions so Y coords are correct.
   return (
     <svg
-      width={svgW}
-      height={svgH}
-      className="video-overlay-svg"
+      viewBox={`0 0 ${videoW} ${videoH}`}
+      preserveAspectRatio="none"
+      width="100%"
+      height="100%"
       style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
     >
       {lines.map((line, i) => {
@@ -355,22 +375,33 @@ export function VideoOverlay({ data, overlays, frameWidth, frameHeight }) {
               <rect
                 x={line.x1} y={line.y1}
                 width={line.x2 - line.x1} height={line.y2 - line.y1}
-                fill="none" stroke={line.color} strokeWidth="1.5" strokeDasharray="4,3"
+                fill="none" stroke={line.color} strokeWidth={videoH / 270}
+                strokeDasharray={`${videoH / 90},${videoH / 135}`}
               />
-              <text x={line.x1 + 4} y={line.y1 + 14} fill={line.color} fontSize="10">
+              <text x={line.x1 + videoW * 0.01} y={line.y1 + videoH * 0.02}
+                fill={line.color} fontSize={videoH / 54} fontWeight="bold">
                 {line.label}
               </text>
             </g>
           )
         }
+        // Waterline: thicker solid line with glow effect
+        const sw = line.type === 'waterline' ? videoH / 180 : videoH / 270
         return (
           <g key={i}>
+            {/* Glow / shadow */}
+            {line.type === 'waterline' && (
+              <line x1={0} y1={line.y} x2={videoW} y2={line.y}
+                stroke={line.color} strokeWidth={sw * 3} strokeOpacity={0.2} />
+            )}
             <line
-              x1={0} y1={line.y} x2={svgW} y2={line.y}
-              stroke={line.color} strokeWidth={line.type === 'waterline' ? 2 : 1}
-              strokeDasharray={line.type === 'candidate' ? '4,4' : 'none'}
+              x1={0} y1={line.y} x2={videoW} y2={line.y}
+              stroke={line.color}
+              strokeWidth={sw}
+              strokeDasharray={line.type === 'candidate' ? `${videoH / 90},${videoH / 135}` : 'none'}
             />
-            <text x={8} y={line.y - 4} fill={line.color} fontSize="11" fontWeight={line.type === 'waterline' ? 'bold' : 'normal'}>
+            <text x={videoW * 0.005} y={line.y - videoH * 0.005}
+              fill={line.color} fontSize={videoH / 54} fontWeight={line.type === 'waterline' ? 'bold' : 'normal'}>
               {line.label}
             </text>
           </g>

@@ -203,32 +203,88 @@ class WaterlineDetector:
                 raw_signal={},
                 candidates=[]
             )
-        total_weight = sum(r['confidence'] for r in results)
-        if total_weight > 0:
-            weighted_y = sum(r['waterline_y'] * r['confidence'] for r in results) / total_weight
-            avg_confidence = sum(r['confidence'] for r in results) / len(results)
-            avg_quality = sum(r['quality'] for r in results) / len(results)
-            best_method = max(results, key=lambda r: r['confidence'])['method']
-            best_idx = max(range(len(results)), key=lambda i: results[i]['confidence'])
-            for i, r in enumerate(results):
-                r['selected'] = (i == best_idx)
-            return WaterlineResult(
-                detected=True,
-                waterline_y=weighted_y,
-                confidence=avg_confidence,
-                method=best_method,
-                quality_score=avg_quality,
-                raw_signal={'detections': results},
-                candidates=results
-            )
+
+        # P1 FIX: Cross-method disagreement check.
+        # The old weighted average buries disagreement — three wrong answers averaged
+        # still produce a wrong answer, but with inflated confidence.
+        #
+        # Fix: penalise confidence when methods disagree significantly.
+        # The spread (max Y - min Y) across methods measures disagreement.
+        # If edge finds Y=700, color finds Y=680, texture finds Y=432:
+        #   spread = 268px → these are not seeing the same thing
+        #
+        # Thresholds:
+        #   spread > 50px  → heavy disagreement penalty
+        #   spread < 20px  → methods likely seeing the same real feature
+        # Otherwise        → mild penalty
+
+        ys = [r['waterline_y'] for r in results]
+        spread = max(ys) - min(ys)  # disagreement in pixels
+
+        # Per-method base confidence
+        base_confidence = sum(r['confidence'] for r in results) / len(results)
+        base_quality = sum(r['quality'] for r in results) / len(results)
+
+        DISAGREEMENT_PENALTY = 0.4  # multiplier when spread > 50px
+        SPREAD_HIGH = 50.0          # px threshold for heavy penalty
+        SPREAD_LOW = 20.0           # px threshold for bonus
+
+        if len(results) == 1:
+            # Single method: no disagreement possible
+            final_y = ys[0]
+            final_confidence = base_confidence
+            best_method = results[0]['method']
+            agreement_bonus = 1.0
+
+        else:
+            # Multiple methods: penalise disagreement
+            if spread >= SPREAD_HIGH:
+                # Heavy disagreement: methods see different things.
+                # Don't trust the weighted average. Use best single method with penalty.
+                agreement_bonus = DISAGREEMENT_PENALTY
+                best_idx = max(range(len(results)), key=lambda i: results[i]['confidence'])
+                final_y = results[best_idx]['waterline_y']
+                best_method = results[best_idx]['method']
+                # Also lower quality score for the disagreement
+                base_quality *= DISAGREEMENT_PENALTY
+
+            elif spread <= SPREAD_LOW:
+                # Low spread: methods are converging on same feature.
+                # This is meaningful agreement — bonus.
+                agreement_bonus = 1.2
+                weighted_y = sum(r['waterline_y'] * r['confidence'] for r in results) / sum(r['confidence'] for r in results)
+                final_y = weighted_y
+                best_method = max(results, key=lambda r: r['confidence'])['method']
+
+            else:
+                # Moderate spread: use weighted average with mild penalty
+                agreement_bonus = max(0.7, 1.0 - (spread - SPREAD_LOW) / 100.0)
+                weighted_y = sum(r['waterline_y'] * r['confidence'] for r in results) / sum(r['confidence'] for r in results)
+                final_y = weighted_y
+                best_method = max(results, key=lambda r: r['confidence'])['method']
+
+        final_confidence = round(min(1.0, base_confidence * agreement_bonus), 3)
+
+        # Mark selected method
+        for i, r in enumerate(results):
+            r['selected'] = (r['method'] == best_method)
+
+        # Store disagreement metadata in raw_signal for diagnostics
+        raw_signal = {
+            'detections': results,
+            'cross_method_spread': round(spread, 1),
+            'agreement_bonus': round(agreement_bonus, 3),
+            'n_methods': len(results),
+        }
+
         return WaterlineResult(
-            detected=False,
-            waterline_y=None,
-            confidence=0.0,
-            method="none",
-            quality_score=0.0,
-            raw_signal={},
-            candidates=[]
+            detected=True,
+            waterline_y=final_y,
+            confidence=final_confidence,
+            method=best_method,
+            quality_score=round(base_quality, 3),
+            raw_signal=raw_signal,
+            candidates=results
         )
 
     def get_diagnostics(self) -> Dict[str, Any]:

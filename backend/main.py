@@ -128,6 +128,53 @@ async def inject_level(level: float):
     return result
 
 
+@app.post("/api/calibration/baseline")
+async def set_calibration_baseline(request: dict):
+    """
+    Manual baseline calibration endpoint.
+    Sets the calibration baseline to a specific pixel Y coordinate.
+    This overrides the automatic baseline that may be locked on wrong features.
+
+    Use this when the scene is DRY (no flooding) and you want to set
+    the baseline reference point manually.
+
+    Body: {"pixel_y": 800}  # dry reference Y from ROI
+    """
+    pixel_y = request.get("pixel_y")
+    if pixel_y is None:
+        raise HTTPException(status_code=400, detail="pixel_y required")
+
+    try:
+        pixel_y = int(pixel_y)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="pixel_y must be an integer")
+
+    # Set baseline in both pipeline calibration AND detector
+    if mode == "video" and pipeline is not None:
+        pipeline.calibration.set_baseline(float(pixel_y))
+        # Also reset calibration state so it uses the manual baseline
+        pipeline.calibration._baseline_established = True
+        pipeline.calibration._calibration_samples.clear()
+
+        # Also update the detector's baseline expectation
+        # Force re-calibration by resetting the calibration quality
+        return {
+            "status": "ok",
+            "baseline_y": pixel_y,
+            "calibration_method": "manual",
+            "message": f"Baseline set to pixel Y={pixel_y}. Water level will be delta from this reference."
+        }
+    elif mode == "simulator":
+        return {
+            "status": "ok",
+            "baseline_y": pixel_y,
+            "mode": "simulator",
+            "message": "Simulator mode — baseline not applicable"
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Pipeline not initialized")
+
+
 async def process_loop():
     global processing, video_cap
     while processing:
@@ -208,15 +255,38 @@ async def process_loop():
             diagnostics = result.get("diagnostics", {})
             blocked = set(diagnostics.get("blocked_inferences", []))
 
-            # Gate risk on blocked_inferences: do not escalate if risk_level is blocked
+            # Base risk from pipeline — gated by measurement confidence.
+            # This is what the pipeline decided given current level + rate + evidence quality.
+            effective_risk = result.get("risk", "SAFE")
+            effective_risk_confidence = result.get("risk_confidence", 0.0)
+
+            # P1 FIX: Prediction-based risk override.
+            # Even if current measurement confidence is low, if the 5-minute forecast
+            # crosses a threshold, escalate risk. This is the actual "early warning" logic.
+            # The pipeline computes ETA; we use it here to override risk level.
+            prediction = result.get("prediction")
+            if prediction and prediction.get("predictedLevel5min") is not None:
+                pred = prediction["predictedLevel5min"]
+                # Override risk if forecast crosses a higher severity threshold.
+                # rate can't always catch sudden rises, but forecast can.
+                if pred >= 70.0:
+                    effective_risk = "CRITICAL"
+                    effective_risk_confidence = max(effective_risk_confidence, 0.3)
+                elif pred >= 50.0 and effective_risk in ["SAFE", "WATCH"]:
+                    effective_risk = "WARNING"
+                    effective_risk_confidence = max(effective_risk_confidence, 0.2)
+                elif pred >= 30.0 and effective_risk == "SAFE":
+                    effective_risk = "WATCH"
+                    effective_risk_confidence = max(effective_risk_confidence, 0.15)
+
+            # Blocked inference: can't trust the level — demote risk regardless.
             if 'risk_level' in blocked or 'water_level' in blocked:
                 effective_risk = 'SAFE'
                 effective_risk_confidence = 0.0
-            else:
-                effective_risk = result.get("risk", "SAFE")
-                effective_risk_confidence = result.get("risk_confidence", 0.0)
 
-            # Only feed to engine if detection succeeded; skip on no-detection to avoid fabricating 0
+            # Only feed to engine if detection succeeded.
+            # P1 FIX: When CV fails, pass confidence=0 to reset engine confidence.
+            # Previously used `continue` which kept stale confidence in engine state.
             if cv_water_level is not None:
                 water_reading = WaterLevelReading(
                     node_id="NODE-001",
@@ -225,11 +295,18 @@ async def process_loop():
                 )
                 engine_result = engine.process(water_reading, cv_confidence=cv_confidence)
             else:
-                # No detection this frame — engine holds last known state
+                # No detection — update engine with zero confidence so stale value doesn't persist.
+                # This is not a "new reading" — it's a gap acknowledgment.
                 engine_result = engine.process(
                     WaterLevelReading(node_id="NODE-001", water_level=engine.state.water_level, source=DataSource.SENSOR),
                     cv_confidence=0.0
                 )
+                # Sleep at video rate for no-detection frames too.
+                fps = video_cap.get(cv2.CAP_PROP_FPS)
+                if fps and fps > 0:
+                    await asyncio.sleep(1.0 / fps)
+                else:
+                    await asyncio.sleep(0)
             signals = result.get("signals", {})
             for sig_key in ["edge", "color", "texture"]:
                 sig = signals.get(sig_key)
@@ -260,6 +337,8 @@ async def process_loop():
                 "rateCmPerMin": result.get("temporal", {}).get("rate_cm_per_min"),
                 # Absolute depth trust status
                 "absoluteDepthStatus": result.get("diagnostics", {}).get("absolute_depth_status", "UNAVAILABLE"),
+                # Actual prediction: ETA to thresholds + projected level
+                "prediction": result.get("prediction"),
                 # Top-level measurement for frontend compatibility
                 "measurement": cv_measurement,
             }
