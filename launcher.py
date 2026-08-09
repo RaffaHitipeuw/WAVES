@@ -116,19 +116,22 @@ def copy_video_to_public():
 def start_backend():
     log("Starting backend server...")
 
-    os.chdir(BACKEND_DIR)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(PROJECT_ROOT)
 
     process = subprocess.Popen(
         [
             sys.executable,
             "-m",
             "uvicorn",
-            "main:app",
+            "backend.main:app",
             "--host",
             "0.0.0.0",
             "--port",
             str(BACKEND_PORT),
         ],
+        cwd=str(PROJECT_ROOT),
+        env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -146,9 +149,6 @@ def start_backend():
 def start_frontend():
     log("Starting frontend server...")
 
-    os.chdir(FRONTEND_DIR)
-
-    # Find npm executable
     npm_cmd = find_npm()
     if not npm_cmd:
         log("ERROR: npm not found in PATH. Is Node.js installed?")
@@ -156,10 +156,11 @@ def start_frontend():
 
     if not (FRONTEND_DIR / "node_modules").exists():
         log("Installing frontend dependencies...")
-        subprocess.run([npm_cmd, "install"], check=True)
+        subprocess.run([npm_cmd, "install"], check=True, cwd=str(FRONTEND_DIR))
 
     process = subprocess.Popen(
         [npm_cmd, "run", "dev"],
+        cwd=str(FRONTEND_DIR),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from starlette.routing import WebSocketRoute
 from typing import Optional
 import asyncio
 import uvicorn
@@ -12,7 +13,7 @@ from datetime import datetime
 from .models import WaterLevelReading, MonitoringNode, RiskLevel, DataSource
 from .simulator import WaterLevelSimulator
 from .engine import FloodEngine
-from .vision import CVPipeline
+from vision import CVPipeline
 
 
 app = FastAPI(title="HydroSignal API")
@@ -20,7 +21,7 @@ app = FastAPI(title="HydroSignal API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -161,24 +162,26 @@ async def process_loop():
 connected_websockets = set()
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket):
+async def ws_handler(websocket: WebSocket):
     await websocket.accept()
     connected_websockets.add(websocket)
     try:
         while True:
             await websocket.receive_text()
-    except:
+    except Exception:
         pass
     finally:
         connected_websockets.discard(websocket)
+
+
+app.router.routes.append(WebSocketRoute("/ws", ws_handler))
 
 
 async def broadcast(data):
     for ws in connected_websockets.copy():
         try:
             await ws.send_json(data)
-        except:
+        except Exception:
             connected_websockets.discard(ws)
 
 

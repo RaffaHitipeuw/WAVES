@@ -3,6 +3,7 @@ from .simulator import WaterLevelSimulator, AsyncWaterLevelSimulator, SimulatorC
 from .engine import CoreEngine, FloodEngine
 from .epistemic import (
     EntityType, RelationType, UnknownCategory, ValidityStatus,
+    EvidenceQuality, InferenceStatus,
     EntityId, ClaimId, EvidenceId, AssumptionId, FailureModeId,
     ValidityScope, ScopedValidity,
     Metric, ProbabilityClaim, Provenance, Requirement, ValidationRecord,
@@ -25,6 +26,8 @@ __all__ = [
     "RelationType",
     "UnknownCategory",
     "ValidityStatus",
+    "EvidenceQuality",
+    "InferenceStatus",
     "EntityId",
     "ClaimId",
     "EvidenceId",

@@ -32,7 +32,7 @@ import {
 } from 'lucide-react'
 import { useFloodWebSocket } from './hooks/useFloodWebSocket'
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = 'http://localhost:8000'
 
 const RISK_CONFIG = {
   SAFE: {
