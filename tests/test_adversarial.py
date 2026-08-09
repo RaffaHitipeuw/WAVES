@@ -391,7 +391,7 @@ class TestDetectorErrorRise:
             print("\n[T10] False rapid rise frame %d:" % i)
             print("  Waterline y: %s" % result['detection']['waterline_y'])
             print("  Trend: %s" % result['temporal']['trend'])
-            print("  Rate: %s" % result['temporal']['rate_of_change'])
+            print("  Rate: %s" % result['temporal']['rate_px_per_sec'])
             print("  Confidence: %.3f" % result['measurement']['confidence'])
             print("  Risk: %s" % result['risk'])
 
@@ -425,7 +425,7 @@ class TestGenuineRapidRise:
         print("\n[T11] Genuine rapid rise (frame 29):")
         print("  Waterline y: %s" % final['detection']['waterline_y'])
         print("  Trend: %s" % final['temporal']['trend'])
-        print("  Rate: %s" % final['temporal']['rate_of_change'])
+        print("  Rate: %s" % final['temporal']['rate_px_per_sec'])
         print("  Confidence: %.3f" % final['measurement']['confidence'])
         print("  Risk: %s" % final['risk'])
         print("  Evidence: %s" % final['evidence'])
@@ -584,7 +584,7 @@ class TestPredictionUncertainty:
         )
         mock_temporal = pipeline.temporal.get_state()
 
-        risk, risk_conf = pipeline._determine_risk(mock_meas, mock_temporal, calibration_confidence=0.05)
+        risk, risk_conf = pipeline._determine_risk(mock_meas, mock_temporal, calibration_result={}, rate_cm_per_min=None)
 
         print("\n[T15] Low confidence + high level:")
         print("  Level: %.1f cm" % mock_meas.water_level)
@@ -599,6 +599,109 @@ class TestPredictionUncertainty:
             "Low-evidence high-level should be SAFE/WATCH, got %s" % risk
         assert risk_conf < 0.2, \
             "Low-evidence risk_conf should be low, got %.3f" % risk_conf
+        print("  PASS")
+
+
+# =============================================================================
+# ADVERSARIAL TEST 16: System doesn't see ground truth change
+# =============================================================================
+# INPUT: Ground truth changes (water level: 20 -> 40 -> 60 cm)
+#        but detector remains locked on wrong static feature.
+#
+# EPISTEMIC QUESTION:
+#   "Can the system detect its own insensitivity?"
+#
+# EXPECTED BEHAVIOR:
+#   - waterline_y_raw stays FLAT (detector stuck)
+#   - confidence may be HIGH (pipeline internally consistent)
+#   - BUT: plausibility evidence should penalise
+#   - AND: stability evidence should flag correlated noise
+#   - AND: measurement validity should reflect scene inconsistency
+#
+#   The system must NOT just output a confident measurement.
+#   It should produce indicators that something is wrong.
+#
+#   KEY METRICS TO WATCH:
+#   - raw waterline_y: should stay FLAT (but is this a bug?)
+#   - plausibility evidence: should DROP if detector jumps don't match physical expectations
+#   - stability evidence: should be PENALISED (correlated noise indicator)
+#   - measurement_validity: should be something other than VALID
+#
+# NOTE: This tests whether the pipeline's internal consistency checks
+# can detect when the observation channel itself has failed.
+
+
+class TestSystemBlindness:
+    def test_detector_locked_on_static_feature(self):
+        """
+        Scenario: Detector consistently finds the same wrong feature.
+        Actual water level rises but detected waterline stays flat.
+
+        This is the OPPOSITE of the "stable but wrong" test (T1).
+        T1: stable wrong detection -> system gives high confidence
+        T16: stable wrong detection -> system MUST show indicators of blindness
+        """
+        wrong_y = 500  # Wrong static feature
+        actual_water_cm = [20.0, 25.0, 30.0, 40.0, 50.0, 60.0]
+        frames = []
+
+        for i in range(15):
+            frame = np.full((1080, 1920, 3), 80, dtype=np.uint8)
+            # The WRONG static feature (detector will always pick this)
+            frame[wrong_y:wrong_y + 25, :] = 240
+            frames.append(frame)
+
+        pipeline = CVPipeline(frame_width=1920, frame_height=1080)
+        results = []
+
+        for i, frame in enumerate(frames):
+            result = pipeline.process_frame(frame, frame_index=i)
+            results.append(result)
+
+        # After 15 frames: waterline_y_raw should be nearly identical (detector locked)
+        raw_positions = [r['detection']['waterline_y'] for r in results if r['detection']['detected']]
+        final = results[-1]
+
+        raw_std = np.std(raw_positions) if len(raw_positions) >= 2 else 0
+        final_conf = final['measurement']['confidence']
+        final_plaus = final['evidence'].get('plausibility', 1.0)
+        final_stab = final['evidence'].get('stability', 1.0)
+
+        print("\n[T16] System blindness (detector locked on static feature):")
+        print("  Raw waterline positions: %s" % [round(y, 1) for y in raw_positions[-5:]])
+        print("  Raw position std: %.3f px" % raw_std)
+        print("  Final measurement confidence: %.3f" % final_conf)
+        print("  Plausibility evidence: %.3f" % final_plaus)
+        print("  Stability evidence: %.3f" % final_stab)
+        print("  Risk: %s" % final['risk'])
+        print("  Diagnostics state: %s" % final['diagnostics']['state'])
+        print("  Blocked inferences: %s" % final['diagnostics'].get('blocked_inferences', []))
+
+        # Assertions:
+        # 1. Raw positions should be very stable (detector locked)
+        assert raw_std < 5.0, \
+            "Detector should be locked on static feature (std=%.1f)" % raw_std
+
+        # 2. Plausibility MUST drop when detector is locked on static feature.
+        # This is the detector-lock penalty added to plausibility evidence.
+        assert final_plaus <= 0.3, \
+            "Plausibility should be penalised when detector is locked: got %.3f" % final_plaus
+        print("  [OK] Plausibility penalised for detector lock (%.3f)" % final_plaus)
+
+        # 3. Stability evidence should be penalised (E8 correlated noise)
+        assert final_stab <= 0.3, \
+            "Stability should be penalised for correlated noise: got %.3f" % final_stab
+        print("  [OK] Stability penalised (E8 correlated noise): %.3f" % final_stab)
+
+        # 4. Confidence must stay low when detector is locked
+        assert final_conf < 0.5, \
+            "Confidence should stay low when detector is locked: got %.3f" % final_conf
+        print("  [OK] Confidence kept low despite stable detection: %.3f" % final_conf)
+
+        # 5. Risk should NOT be WARNING/CRITICAL
+        assert final['risk'] in ['SAFE', 'WATCH'], \
+            "Risk should not escalate for a potentially blind detection: got %s" % final['risk']
+
         print("  PASS")
 
 
@@ -626,6 +729,7 @@ if __name__ == '__main__':
         TestSimulatorConfidence(),
         TestRepeatedFrames(),
         TestPredictionUncertainty(),
+        TestSystemBlindness(),
     ]
 
     passed = 0

@@ -110,21 +110,3 @@ class MeasurementProcessor:
         # Weight it at 0.35 here to avoid double-counting signal strength.
         confidence = detection_conf * 0.35 + temporal_conf * 0.35
         return min(0.85, max(0.0, confidence))
-
-    def validate_measurement(
-        self,
-        measurement: MeasurementResult,
-        previous_measurement: Optional[MeasurementResult]
-    ) -> MeasurementResult:
-        if previous_measurement is None:
-            return measurement
-        if not measurement.is_valid:
-            return measurement
-        if measurement.water_level is None or previous_measurement.water_level is None:
-            return measurement
-        delta = abs(measurement.water_level - previous_measurement.water_level)
-        if delta > 20:
-            measurement.measurement_status = 'SUDDEN_CHANGE'
-            measurement.is_valid = False
-            measurement.details['warning'] = f'Sudden change: {delta:.1f}cm'
-        return measurement

@@ -223,22 +223,42 @@ function VideoMonitor({ videoRef, measurement, isPlaying, mode, overlays, wsData
   )
 }
 
-function PrimaryDisplay({ measurement, risk }) {
+function PrimaryDisplay({ measurement, absoluteDepthStatus, measurementValidity }) {
+  const risk = measurement?.risk || 'SAFE'
   const riskConfig = RISK_CONFIG[risk] || RISK_CONFIG.SAFE
   const waterLevel = measurement?.waterLevel
   const isValid = measurement?.isValid !== false
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
   const StatusIcon = statusConfig.icon
 
+  // Depth trust indicator
+  const depthColors = {
+    'TRUSTED': { color: 'text-risk-safe', bg: 'bg-risk-safe', label: 'Trusted' },
+    'APPROXIMATE': { color: 'text-risk-watch', bg: 'bg-risk-watch', label: 'Approx.' },
+    'UNAVAILABLE': { color: 'text-text-muted', bg: 'bg-text-muted', label: 'No Depth' },
+    'UNKNOWN': { color: 'text-text-muted', bg: 'bg-text-muted', label: 'Unknown' },
+  }
+  const depthInfo = depthColors[absoluteDepthStatus] || depthColors.UNKNOWN
+
   return (
     <div className="primary-display">
-      <div className="primary-label">Predicted Water Level</div>
+      <div className="primary-label">
+        Current Water Level
+        <span className={`ml-2 text-[9px] px-1.5 py-0.5 rounded border ${depthInfo.color} border-current opacity-70`}>
+          {depthInfo.label}
+        </span>
+      </div>
       <div className="primary-value-container">
         <span className={`primary-value ${!isValid ? 'text-text-muted' : riskConfig.color}`}>
           {isValid ? formatNumber(waterLevel) : '--'}
         </span>
         <span className="primary-unit">cm</span>
       </div>
+      {measurementValidity && measurementValidity !== 'VALID' && (
+        <div className="mt-2 text-xs text-risk-watch">
+          {measurementValidity.replace(/_/g, ' ')}
+        </div>
+      )}
       {!isValid && (
         <div className={`mt-3 flex items-center justify-center gap-2 ${statusConfig.color}`}>
           <StatusIcon size={14} />
@@ -301,6 +321,8 @@ function ConfidenceCard({ measurement }) {
 function RateOfRisePanel({ measurement, history }) {
   const rateOfChange = measurement?.rateOfChange || 0
   const trend = measurement?.trend || 'UNKNOWN'
+  // Rate unit: cm/min from pipeline physical rate
+  // If null, it means calibration not established (can't convert px to cm)
 
   let trendColor = 'text-text-secondary'
   let trendIndicator = '→'
@@ -323,14 +345,16 @@ function RateOfRisePanel({ measurement, history }) {
     <div className="rate-panel">
       <div className="panel-title mb-3">
         <Activity size={12} />
-        Rate of Rise
+        Rate of Change
       </div>
       <div className="flex items-end justify-between">
         <div>
           <div className={`rate-value ${rateOfChange >= 0 ? 'text-risk-warning' : 'text-risk-safe'}`}>
-            {rateOfChange >= 0 ? '+' : ''}{formatNumber(rateOfChange)}
+            {rateOfChange != null && rateOfChange !== 0 ? `${rateOfChange >= 0 ? '+' : ''}${formatNumber(rateOfChange)}` : '--'}
           </div>
-          <div className="text-sm text-text-muted mt-1">cm per minute</div>
+          <div className="text-sm text-text-muted mt-1">
+            {rateOfChange != null ? 'cm / min' : 'No physical rate'}
+          </div>
         </div>
         <div className="text-right">
           <div className={`rate-trend-indicator ${trendColor}`}>
@@ -593,15 +617,34 @@ function App() {
   const measurement = data?.measurement || videoMeasurement
   const state = data?.state || {}
   const processed = data?.processed || {}
-  const frontendMeasurement = measurement || {
+  const temporalData = data?.temporal || {}
+
+  // Primary rate source: pipeline's physical rate (cm/min).
+  // Fallback to engine's processed rate (cm/min).
+  const physicalRate = data?.rateCmPerMin ?? processed.rateOfChange ?? state.rateOfChange ?? null
+
+  const frontendMeasurement = measurement ? {
+    ...measurement,
+    // Use pipeline's physical rate (cm/min) as authoritative source
+    rateOfChange: physicalRate,
+    measurementValidity: measurement.measurementValidity || 'UNKNOWN',
+    // Trend from temporal buffer — needed by RateOfRisePanel
+    trend: temporalData.trend || measurement.trend || 'UNKNOWN',
+    // Physical rate in px/s for diagnostics
+    ratePxPerSec: temporalData.rate_px_per_sec,
+  } : {
     waterLevel: processed.rawWaterLevel ?? state.waterLevel ?? 0,
     smoothedLevel: processed.smoothedWaterLevel ?? state.smoothedLevel ?? 0,
     confidence: processed.confidence ?? state.confidence ?? 0,
-    rateOfChange: processed.rateOfChange ?? state.rateOfChange ?? 0,
+    rateOfChange: physicalRate,
     risk: state.risk || 'SAFE',
-    isValid: measurement ? (measurement.isValid !== false) : true,
-    measurementStatus: measurement?.measurementStatus || 'SIMULATOR',
+    isValid: true,
+    measurementStatus: 'SIMULATOR',
+    measurementValidity: 'VALID',
+    trend: 'STABLE',
   }
+
+  const absoluteDepthStatus = data?.absoluteDepthStatus || 'UNKNOWN'
 
   const waterLevel = frontendMeasurement.waterLevel
   const smoothed = frontendMeasurement.smoothedLevel
@@ -725,7 +768,11 @@ function App() {
           />
         </div>
         <div className="mb-6">
-          <PrimaryDisplay measurement={frontendMeasurement} risk={risk} />
+          <PrimaryDisplay
+            measurement={frontendMeasurement}
+            absoluteDepthStatus={absoluteDepthStatus}
+            measurementValidity={frontendMeasurement.measurementValidity}
+          />
         </div>
         <div className="metric-grid mb-6">
           <MetricCard

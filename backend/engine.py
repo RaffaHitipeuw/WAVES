@@ -145,7 +145,12 @@ class CoreEngine:
         current_level = reading.water_level
         current_time = reading.timestamp
         time_diff = (current_time - self._previous_timestamp).total_seconds()
-        if time_diff <= 0:
+        # Guard against back-to-back calls: require at least 0.1s between readings
+        # to compute a meaningful rate. Fast successive calls (same tick) produce
+        # spurious large rates.
+        if time_diff < 0.1:
+            self._previous_level = current_level
+            self._previous_timestamp = current_time
             return 0.0
         level_change = current_level - self._previous_level
         rate = (level_change / time_diff) * 60
@@ -192,13 +197,33 @@ class FloodEngine(CoreEngine):
         water_level: float,
         rate: float
     ) -> RiskLevel:
+        """
+        Rate-unit: cm/min (from _calculate_rate_of_change).
+        If rate is None or 0, fall back to level-only determination.
+        """
         thresholds = self.node.thresholds
+
+        # Rate thresholds in cm/min
+        HIGH_RATE = 5.0   # cm/min — rapid rise warrants escalation
+        MOD_RATE = 2.0    # cm/min — moderate rise
+
+        # Level-only escalation
         if water_level >= thresholds["critical"]:
             return RiskLevel.CRITICAL
         elif water_level >= thresholds["warning"]:
+            # Rate can escalate or de-escalate WARNING
+            if rate is not None and abs(rate) >= HIGH_RATE:
+                return RiskLevel.CRITICAL  # rapid rise
             return RiskLevel.WARNING
         elif water_level >= thresholds["watch"]:
+            if rate is not None and rate >= HIGH_RATE:
+                return RiskLevel.WARNING   # early escalation for rapid rise
             return RiskLevel.WATCH
+
+        # Below watch threshold
+        if rate is not None and rate >= HIGH_RATE * 1.5:
+            return RiskLevel.WATCH  # watch for potential escalation
+
         return RiskLevel.SAFE
 
     def create_alert(

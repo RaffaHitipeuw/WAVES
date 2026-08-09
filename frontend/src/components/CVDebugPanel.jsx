@@ -98,17 +98,34 @@ export function CandidatePanel({ candidates }) {
 
 export function DiagnosticsPanel({ diagnostics }) {
   if (!diagnostics) return null
-  const { state, reasons = [], permitted_inferences = [], blocked_inferences = [], calibration_status, calibration_valid, calibration_method } = diagnostics
+  const {
+    state,
+    reasons = [],
+    permitted_inferences = [],
+    blocked_inferences = [],
+    calibration_status,
+    calibration_valid,
+    calibration_method,
+    absolute_depth_status,
+    absolute_depth_note,
+  } = diagnostics
+
+  const depthStatusColors = {
+    'TRUSTED': 'text-risk-safe',
+    'APPROXIMATE': 'text-risk-watch',
+    'UNAVAILABLE': 'text-risk-critical',
+  }
+
   return (
     <div className="debug-section">
       <div className="debug-section-title">Why Accepted / Rejected</div>
       {reasons.length === 0 ? (
-        <div className="diag-ok">No rejection reasons — measurement accepted</div>
+        <div className="diag-ok">No rejection reasons -- measurement accepted</div>
       ) : (
         <div className="reasons-list">
           {reasons.map((r, i) => (
             <div key={i} className="reason-item">
-              <span className="reason-bullet">•</span>
+              <span className="reason-bullet">*</span>
               {r}
             </div>
           ))}
@@ -118,8 +135,17 @@ export function DiagnosticsPanel({ diagnostics }) {
         <div className="calibration-info">
           <span>Calibration: {calibration_method}</span>
           <span className={calibration_valid ? 'text-risk-safe' : 'text-risk-warning'}>
-            {calibration_valid ? 'VALID' : 'INVALID'} — {calibration_status}
+            {calibration_valid ? 'VALID' : 'INVALID'} -- {calibration_status}
           </span>
+        </div>
+      )}
+      {absolute_depth_status && (
+        <div className={`depth-status ${depthStatusColors[absolute_depth_status] || 'text-text-muted'}`}>
+          <div className="depth-status-label">Absolute Depth:</div>
+          <div className="depth-status-value">{absolute_depth_status}</div>
+          {absolute_depth_note && (
+            <div className="depth-status-note">{absolute_depth_note}</div>
+          )}
         </div>
       )}
       {permitted_inferences.length > 0 && (

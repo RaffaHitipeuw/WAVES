@@ -101,7 +101,9 @@ class WaterLevelSimulator:
         print(f"[Simulator] Starting level: {self.start_level} cm")
         self._running = True
         self.current_level = self.start_level
-        self._generate_reading()
+        # Do NOT call _generate_reading() here — process_loop calls it.
+        # Calling it here would create a spurious Reading #1 that gets thrown away,
+        # and its timestamp pollutes the engine's _previous_timestamp, breaking rate calc.
 
     def stop(self) -> None:
         if not self._running:

@@ -7,7 +7,6 @@ from .waterline import WaterlineDetector, create_default_detector
 from .temporal import TemporalBuffer
 from .calibration import CalibrationModel, estimate_calibration_from_scene
 from .measurement import MeasurementProcessor, MeasurementResult
-from .confidence import ConfidenceCalculator
 
 
 @dataclass
@@ -54,13 +53,6 @@ class CVPipeline:
         self.measurement = MeasurementProcessor(
             min_confidence_threshold=0.3,
             max_pixel_rate=50.0
-        )
-
-        self.confidence_calc = ConfidenceCalculator(
-            detection_weight=0.35,
-            temporal_weight=0.35,
-            stability_weight=0.20,
-            plausibility_weight=0.10
         )
 
         self._frame_count = 0
@@ -165,7 +157,18 @@ class CVPipeline:
             'quality_score': detection_result.quality_score
         }
 
-        risk, risk_confidence = self._determine_risk(measurement_result, temporal_state, calibration_confidence=calibration_conf)
+        # Convert pixel-rate to physical-rate for risk determination.
+        # temporal_state.rate_of_change is px/s.
+        # Calibration result gives pixels_per_cm.
+        px_per_cm = calibration_result.get('pixelsPerCm')
+        if temporal_state.rate_of_change is not None and px_per_cm and px_per_cm > 0:
+            rate_cm_per_min = round(temporal_state.rate_of_change / px_per_cm * 60, 2)
+        else:
+            rate_cm_per_min = None
+
+        risk, risk_confidence = self._determine_risk(
+            measurement_result, temporal_state, calibration_result, rate_cm_per_min
+        )
 
         evidence = self._calculate_evidence(
             detection_result, temporal_state, calibration_result
@@ -185,7 +188,9 @@ class CVPipeline:
             'waterline_y': temporal_state.waterline_y,
             'raw_waterline_y': temporal_state.raw_waterline_y,
             'trend': temporal_state.trend,
-            'rate_of_change': temporal_state.rate_of_change,
+            # Note: rate_of_change is in px/s (not physical units)
+            'rate_px_per_sec': temporal_state.rate_of_change,
+            'rate_cm_per_min': rate_cm_per_min,
             'confidence': temporal_state.confidence,
             'valid_detections': temporal_state.valid_detections,
             'invalid_detections': temporal_state.invalid_detections,
@@ -194,12 +199,26 @@ class CVPipeline:
             'detection_rate': round(self.temporal.detection_rate_value, 3)
         }
 
+        # Categorical measurement validity — can this observation become a trusted physical measurement?
+        # Separate from measurement_confidence (internal pipeline quality).
+        if not calibration_result.get('calibrated'):
+            meas_validity = 'UNCALIBRATED'
+        elif temporal_state.invalid_detections >= 3:
+            meas_validity = 'UNSTABLE'
+        elif calibration_conf < 0.3:
+            meas_validity = 'LOW_QUALITY'
+        elif not measurement_result.is_valid:
+            meas_validity = 'NO_DETECTION'
+        else:
+            meas_validity = 'VALID'
+
         measurement_dict = {
             'waterLevel': measurement_result.water_level,
             'pixelWaterline': measurement_result.pixel_waterline,
             'confidence': measurement_result.confidence,
             'calibrationConfidence': calibration_conf,
             'measurementStatus': measurement_result.measurement_status,
+            'measurementValidity': meas_validity,
             'isValid': measurement_result.is_valid,
             'smoothedLevel': temporal_state.waterline_y
         }
@@ -309,6 +328,7 @@ class CVPipeline:
                 y_val = self.temporal._waterline_y[-(i + 1)]
                 if y_val is not None:
                     recent_y_values.append(y_val)
+        plausibility_conf = 0.5
         if len(recent_y_values) >= 5:
             y_std = float(np.std(recent_y_values))
             # Very low std means all detections are at nearly the same pixel position.
@@ -317,17 +337,28 @@ class CVPipeline:
                 stability_conf = min(stability_conf, 0.2)
             elif y_std < 5.0:
                 stability_conf = min(stability_conf, 0.5)
+            # Detector-lock: unique positions barely change — detector stuck on static feature.
+            # This is a different signal from std-based correlated-noise penalty.
+            # The std penalty catches near-identical values; this catches TOTAL stagnation.
+            unique_y = len(set(round(y, 1) for y in recent_y_values))
+            if unique_y <= 2:
+                plausibility_conf = min(plausibility_conf, 0.2)
+
         calibration_conf = self._calibration_quality(
             calibration_result, temporal_state
         )
         brightness = self.detector.get_diagnostics().get('avg_brightness', 128.0)
         lighting_conf = 1.0 if 30 <= brightness <= 220 else max(0.0, min(1.0, brightness / 128.0))
-        plausibility_conf = 0.5
+        # Level-delta plausibility: if the detector IS moving (delta >= 5), we can be more confident
+        # that it's not locked. But ONLY raise plausibility — never lower it below detector-lock floor.
         if self._last_confidence is not None and detection_result.detected:
             level = calibration_result.get('waterLevel')
             if level is not None and self._last_confidence.get('level') is not None:
                 delta = abs(level - self._last_confidence['level'])
-                plausibility_conf = 0.9 if delta < 5 else (0.5 if delta < 20 else 0.2)
+                if delta >= 5:
+                    plausibility_conf = max(plausibility_conf, 0.5)
+                if delta >= 20:
+                    plausibility_conf = max(plausibility_conf, 0.9)
         self._last_confidence = {
             'detection': detection_conf,
             'temporal': temporal_conf,
@@ -375,13 +406,45 @@ class CVPipeline:
         if temporal_state.invalid_detections > 0:
             reasons.append(f'{temporal_state.invalid_detections} recent invalid detections in buffer')
             permitted.append('temporal_accumulation')
+
+        # Detector lock detection: raw positions are identical for many consecutive frames.
+        # This is distinct from plausibility (which checks delta between frames).
+        # Plausibility: "did the level jump suddenly?" -> catches discontinuities
+        # Detector lock: "is the detector returning the same value repeatedly?" -> catches stagnation
+        # Both can indicate a broken observation channel.
+        recent_y = list(self.temporal._waterline_y)[-20:] if hasattr(self.temporal, '_waterline_y') else []
+        non_none_y = [y for y in recent_y if y is not None]
+        if len(non_none_y) >= 10:
+            unique_y = len(set(round(y, 1) for y in non_none_y))
+            if unique_y <= 2:
+                reasons.append('detector may be locked: only %d unique position(s) in last %d frames' % (unique_y, len(non_none_y)))
+                permitted.append('temporal_accumulation')
+                blocked.append('water_level')
         if not calibration_result.get('calibrated'):
             calib_status = calibration_result.get('status', 'unknown')
             reasons.append(f'calibration not established: {calib_status}')
             blocked.extend(['absolute_depth'])
             permitted.append('relative_level')
+        elif calibration_result.get('calibrationMethod', '').startswith('relative'):
+            # Even with relative calibration, cm is approximate
+            reasons.append('calibration is relative-only: cm values are linear approximation')
+            permitted.append('relative_level')
+            # Don't block absolute_depth, but mark it as approximate in the diagnostics
         if not self.detector.get_diagnostics().get('detection_stability') == 'stable':
             permitted.append('trend_direction')
+        # Determine absolute_depth trust level
+        # Current calibration is a LINEAR MODEL (pixels_per_cm ratio).
+        # This does NOT account for perspective distortion, lens distortion,
+        # or camera angle. The cm value is therefore APPROXIMATE.
+        if not calibration_result.get('calibrated'):
+            abs_depth_status = 'UNAVAILABLE'
+        elif calibration_result.get('calibrationMethod') == 'absolute':
+            abs_depth_status = 'TRUSTED'  # Uses physical reference — higher confidence
+        elif calibration_result.get('calibrationMethod', '').startswith('relative'):
+            abs_depth_status = 'APPROXIMATE'  # Linear model only — perspective unmodeled
+        else:
+            abs_depth_status = 'APPROXIMATE'
+
         return {
             'state': state,
             'reasons': reasons,
@@ -390,6 +453,14 @@ class CVPipeline:
             'calibration_status': calibration_result.get('status', 'unknown'),
             'calibration_valid': calibration_result.get('calibrated', False),
             'calibration_method': calibration_result.get('calibrationMethod', 'unknown'),
+            'absolute_depth_status': abs_depth_status,
+            'absolute_depth_note': (
+                'Pixel-to-cm conversion uses linear model only. '
+                'Perspective distortion, lens distortion, and camera angle '
+                'are NOT compensated. cm values are APPROXIMATE.' if abs_depth_status == 'APPROXIMATE'
+                else 'Absolute calibration with physical reference.' if abs_depth_status == 'TRUSTED'
+                else 'Calibration not established — cm values unavailable.'
+            ),
             'detector_info': self.detector.get_diagnostics(),
             'buffer_full': len(temporal_state.detection_history) >= 30
         }
@@ -471,8 +542,15 @@ class CVPipeline:
         self,
         measurement: MeasurementResult,
         temporal_state,
-        calibration_confidence: float = 0.0
+        calibration_result: Optional[Dict] = None,
+        rate_cm_per_min: Optional[float] = None
     ) -> tuple:
+        """
+        Determines risk level based on physical reading, evidence quality, and rate of change.
+
+        rate_cm_per_min: physical rate of change in cm/min (converted from px/s by pipeline).
+                         None if calibration not established (cannot convert px to cm).
+        """
         if not measurement.is_valid or measurement.water_level is None:
             return 'SAFE', 0.0
         level = measurement.water_level
@@ -480,7 +558,6 @@ class CVPipeline:
 
         # Evidential gate: do not escalate to WARNING/CRITICAL unless
         # measurement confidence is above minimum threshold.
-        # This prevents risk escalation from poorly-evidenced measurements.
         MIN_EVIDENCE_FOR_WARNING = 0.15
         if meas_conf < MIN_EVIDENCE_FOR_WARNING:
             # Level is elevated but evidence is insufficient — downgrade severity
@@ -493,13 +570,27 @@ class CVPipeline:
             else:
                 return 'SAFE', round(meas_conf * 0.2, 3)
 
+        # Rate-aware escalation (rate_cm_per_min is in cm/min)
+        # HIGH_RATE: rapid rise warrants escalation
+        HIGH_RATE = 5.0   # cm/min
+        MOD_RATE = 2.0    # cm/min
+
+        # Level + rate determination
         if level >= 70:
+            # CRITICAL threshold — rate doesn't de-escalate from CRITICAL
             return 'CRITICAL', round(meas_conf, 3)
         elif level >= 50:
+            if rate_cm_per_min is not None and abs(rate_cm_per_min) >= HIGH_RATE:
+                return 'CRITICAL', round(meas_conf, 3)
             return 'WARNING', round(meas_conf * 0.85, 3)
         elif level >= 30:
+            if rate_cm_per_min is not None and rate_cm_per_min >= HIGH_RATE:
+                return 'WARNING', round(meas_conf * 0.8, 3)
             return 'WATCH', round(meas_conf * 0.8, 3)
         else:
+            # Below WATCH threshold — only escalate if rate is very high
+            if rate_cm_per_min is not None and rate_cm_per_min >= HIGH_RATE * 1.5:
+                return 'WATCH', round(meas_conf * 0.7, 3)
             return 'SAFE', round(meas_conf * 0.9, 3)
 
     def reset(self):

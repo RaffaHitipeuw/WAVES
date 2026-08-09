@@ -6,7 +6,6 @@ from .waterline import WaterlineDetector
 from .temporal import TemporalBuffer
 from .calibration import CalibrationModel
 from .measurement import MeasurementProcessor
-from .confidence import ConfidenceCalculator
 from .pipeline import CVPipeline
 
 __all__ = [
@@ -14,6 +13,5 @@ __all__ = [
     'TemporalBuffer',
     'CalibrationModel',
     'MeasurementProcessor',
-    'ConfidenceCalculator',
     'CVPipeline'
 ]

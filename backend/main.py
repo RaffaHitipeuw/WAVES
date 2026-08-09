@@ -135,16 +135,65 @@ async def process_loop():
             reading = simulator._generate_reading()
             if reading:
                 result = engine.process(reading)
-                result["diagnostics"] = {
+                processed = result["processed"]
+                rate = processed.get("rateOfChange", 0.0) or 0.0
+                # Derive trend from rate (engine doesn't compute this)
+                abs_rate = abs(rate)
+                if abs_rate < 0.5:
+                    trend = "STABLE"
+                elif abs_rate < 3.0:
+                    trend = "RISING" if rate > 0 else "FALLING"
+                elif rate > 0:
+                    trend = "RISING_FAST"
+                else:
+                    trend = "FALLING_FAST"
+                simulator_diagnostics = {
                     "state": "SIMULATOR",
                     "reasons": [],
                     "permitted_inferences": ["simulated_water_level"],
                     "blocked_inferences": []
                 }
-                result["evidence"] = {}
-                result["signals"] = {}
-                result["candidates"] = []
-                await broadcast(result)
+                # Build complete broadcast matching frontend expectations
+                full_result = {
+                    **result,
+                    # Frontend uses data.measurement — provide it from engine result
+                    "measurement": {
+                        "waterLevel": processed.get("rawWaterLevel"),
+                        "smoothedLevel": processed.get("smoothedWaterLevel"),
+                        "confidence": processed.get("confidence", 0.0),
+                        "isValid": True,
+                        "measurementStatus": "SIMULATOR",
+                        "measurementValidity": "VALID",
+                        "trend": trend,
+                    },
+                    "temporal": {
+                        "trend": trend,
+                        "rate_px_per_sec": None,
+                        "rate_cm_per_min": rate,  # engine rate is already cm/min
+                        "waterline_y": None,
+                        "raw_waterline_y": None,
+                        "valid_detections": 0,
+                        "invalid_detections": 0,
+                        "confidence": processed.get("confidence", 0.0),
+                    },
+                    "detection": {},  # van-mode guard: data.detection exists but empty
+                    "evidence": {
+                        "detection": processed.get("confidence", 0.0),
+                        "temporal": processed.get("confidence", 0.0),
+                        "stability": 1.0,
+                        "calibration": 1.0,
+                        "lighting": 1.0,
+                        "plausibility": 1.0,
+                    },
+                    "signals": {},
+                    "candidates": [],
+                    "risk_confidence": processed.get("confidence", 0.0),
+                    "diagnostics": simulator_diagnostics,
+                    "rateCmPerMin": rate,
+                    "absoluteDepthStatus": "SIMULATOR",
+                    "video": None,
+                }
+                await broadcast(full_result)
         elif mode == "video":
             if video_cap is None or not video_cap.isOpened():
                 break
@@ -206,6 +255,11 @@ async def process_loop():
                 "risk": effective_risk,
                 "risk_confidence": effective_risk_confidence,
                 "risk_blocked": 'risk_level' in blocked,
+                # Use pipeline's physical rate (cm/min) — not engine's px/s
+                # Pipeline converts px/s to cm/min using calibration pixels_per_cm
+                "rateCmPerMin": result.get("temporal", {}).get("rate_cm_per_min"),
+                # Absolute depth trust status
+                "absoluteDepthStatus": result.get("diagnostics", {}).get("absolute_depth_status", "UNAVAILABLE"),
                 # Top-level measurement for frontend compatibility
                 "measurement": cv_measurement,
             }
