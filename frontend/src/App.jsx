@@ -33,6 +33,7 @@ import {
 } from 'lucide-react'
 import { useFloodWebSocket } from './hooks/useFloodWebSocket'
 import { CVDebugPanel, VideoOverlay } from './components/CVDebugPanel'
+import { VanScenarioDiagnostic } from './components/VanScenarioDiagnostic'
 
 const API_BASE = 'http://localhost:8000'
 
@@ -91,7 +92,7 @@ function formatTime(timestamp) {
   }
 }
 
-function StatusBar({ status, nodeId, mode, progress, debugMode, onToggleDebug }) {
+function StatusBar({ status, nodeId, mode, progress, debugMode, onToggleDebug, vanMode, onToggleVan }) {
   return (
     <div className="status-bar">
       <div className="status-bar-logo">
@@ -126,6 +127,15 @@ function StatusBar({ status, nodeId, mode, progress, debugMode, onToggleDebug })
         >
           <Bug size={14} />
           <span>CV DEBUG</span>
+        </button>
+        <button
+          onClick={onToggleVan}
+          className={`debug-toggle-btn ${vanMode ? 'active' : ''}`}
+          title="Toggle Van Scenario Diagnostic"
+          style={vanMode ? { borderColor: '#c084fc', color: '#c084fc', background: 'rgba(192,132,252,0.15)' } : {}}
+        >
+          <Activity size={14} />
+          <span>VAN DIAG</span>
         </button>
       </div>
     </div>
@@ -567,7 +577,9 @@ function App() {
   const [mode, setMode] = useState('video')
   const [systemMode, setSystemMode] = useState('video')
   const [debugMode, setDebugMode] = useState(false)
+  const [vanMode, setVanMode] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
+  const [vanHistory, setVanHistory] = useState([])
   const [overlays, setOverlays] = useState({
     waterline: true,
     candidates: true,
@@ -609,6 +621,34 @@ function App() {
       })
     }
   }, [connected])
+
+  // Track pipeline history for VanScenarioDiagnostic
+  useEffect(() => {
+    if (vanMode && data?.detection) {
+      setVanHistory(prev => {
+        const newEntry = {
+          frame: data.frame_index,
+          waterline_y: data.detection?.waterline_y,
+          waterline_y_raw: data.detection?.waterline_y,
+          waterline_y_smooth: data.temporal?.waterline_y,
+          detection_score: data.evidence?.detection,
+          temporal_score: data.evidence?.temporal,
+          stability_score: data.evidence?.stability,
+          calibration_score: data.evidence?.calibration,
+          lighting_score: data.evidence?.lighting,
+          plausibility_score: data.evidence?.plausibility,
+          confidence: data.measurement?.confidence ?? data.risk_confidence,
+          measurement_confidence: data.measurement?.confidence,
+          risk_confidence: data.risk_confidence,
+          risk: data.risk,
+          state: data.diagnostics?.state,
+          smoothed: data.temporal?.waterline_y,
+        }
+        const updated = [...prev, newEntry]
+        return updated.slice(-100) // keep last 100 frames
+      })
+    }
+  }, [data, vanMode])
 
   const handleStart = async () => {
     try {
@@ -671,6 +711,8 @@ function App() {
           progress={progress}
           debugMode={debugMode}
           onToggleDebug={() => setDebugMode(d => !d)}
+          vanMode={vanMode}
+          onToggleVan={() => setVanMode(v => !v)}
         />
         <div className="mb-6">
           <VideoMonitor
@@ -745,6 +787,16 @@ function App() {
               onTogglePause={handleTogglePause}
               overlays={overlays}
               onToggleOverlay={handleToggleOverlay}
+              isVideoMode={systemMode === 'video'}
+            />
+          </div>
+        )}
+
+        {vanMode && data?.video && (
+          <div className="mb-6 animate-fade-in">
+            <VanScenarioDiagnostic
+              data={data}
+              history={vanHistory}
               isVideoMode={systemMode === 'video'}
             />
           </div>
