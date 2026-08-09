@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from dataclasses import dataclass
-from typing import Optional, Tuple, Dict, Any
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List
 
 
 @dataclass
@@ -12,6 +12,7 @@ class WaterlineResult:
     method: str
     quality_score: float
     raw_signal: Dict[str, Any]
+    candidates: List[Dict] = field(default_factory=list)
 
 
 @dataclass
@@ -32,6 +33,17 @@ class ROI:
     def contains(self, x: int, y: int) -> bool:
         return self.x_min <= x <= self.x_max and self.y_min <= y <= self.y_max
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "x_min": self.x_min,
+            "x_max": self.x_max,
+            "y_min": self.y_min,
+            "y_max": self.y_max,
+            "width": self.width,
+            "height": self.height,
+            "usable_pixels": self.width * self.height if self.width > 0 and self.height > 0 else 0
+        }
+
 
 class WaterlineDetector:
     def __init__(
@@ -47,21 +59,29 @@ class WaterlineDetector:
         self.min_confidence = min_confidence
         self._frame_count = 0
         self._avg_brightness = 128.0
+        self._last_candidates: List[Dict] = []
+        self._last_edge_signal: Optional[np.ndarray] = None
+        self._last_color_signal: Optional[np.ndarray] = None
+        self._last_texture_signal: Optional[np.ndarray] = None
+        self._previous_waterline: Optional[float] = None
 
     def detect(self, frame: np.ndarray) -> WaterlineResult:
         self._frame_count += 1
         roi_frame = self._extract_roi(frame)
         if roi_frame is None or roi_frame.size == 0:
-            return WaterlineResult(
+            result = WaterlineResult(
                 detected=False,
                 waterline_y=None,
                 confidence=0.0,
                 method="none",
                 quality_score=0.0,
-                raw_signal={}
+                raw_signal={},
+                candidates=[]
             )
+            self._last_candidates = []
+            return result
         self._update_statistics(roi_frame)
-        results = []
+        results: List[Dict] = []
         edge_result = self._detect_by_edges(roi_frame)
         if edge_result:
             results.append(edge_result)
@@ -71,7 +91,10 @@ class WaterlineDetector:
         texture_result = self._detect_by_texture(roi_frame)
         if texture_result:
             results.append(texture_result)
-        return self._combine_results(results, frame.shape[0])
+        self._last_candidates = results
+        combined = self._combine_results(results, frame.shape[0])
+        self._previous_waterline = combined.waterline_y
+        return combined
 
     def _extract_roi(self, frame: np.ndarray) -> Optional[np.ndarray]:
         h, w = frame.shape[:2]
@@ -94,13 +117,11 @@ class WaterlineDetector:
         sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
         horizontal_edges = np.abs(sobely)
         row_edge_strength = np.mean(horizontal_edges, axis=1)
+        self._last_edge_signal = row_edge_strength.copy()
         max_edge_idx = np.argmax(row_edge_strength)
         max_edge_strength = row_edge_strength[max_edge_idx]
         noise_estimate = np.std(row_edge_strength)
-        if noise_estimate > 0:
-            quality = min(1.0, max_edge_strength / (noise_estimate * 3))
-        else:
-            quality = 0.0
+        quality = min(1.0, max_edge_strength / (noise_estimate * 3)) if noise_estimate > 0 else 0.0
         confidence = min(1.0, max_edge_strength / 100.0)
         if max_edge_strength > self.edge_threshold and confidence > self.min_confidence:
             waterline_y = self.roi.y_min + max_edge_idx
@@ -109,8 +130,12 @@ class WaterlineDetector:
                 'confidence': confidence,
                 'quality': quality,
                 'method': 'edge',
-                'edge_strength': max_edge_strength,
-                'edge_idx_roi': max_edge_idx
+                'edge_strength': float(max_edge_strength),
+                'noise_estimate': float(noise_estimate),
+                'edge_idx_roi': int(max_edge_idx),
+                'signal': row_edge_strength.tolist(),
+                'signal_peak': float(max_edge_strength),
+                'selected': False
             }
         return None
 
@@ -119,6 +144,7 @@ class WaterlineDetector:
         b, g, r = cv2.split(roi_frame.astype(np.float32))
         blue_excess = b - r
         row_blue_excess = np.mean(blue_excess, axis=1)
+        self._last_color_signal = row_blue_excess.copy()
         max_blue_idx = np.argmax(row_blue_excess)
         max_blue_excess = row_blue_excess[max_blue_idx]
         quality = min(1.0, max_blue_excess / 20.0) if max_blue_excess > 0 else 0.0
@@ -130,7 +156,11 @@ class WaterlineDetector:
                 'confidence': confidence,
                 'quality': quality,
                 'method': 'color',
-                'blue_excess': max_blue_excess
+                'blue_excess': float(max_blue_excess),
+                'color_idx_roi': int(max_blue_idx),
+                'signal': row_blue_excess.tolist(),
+                'signal_peak': float(max_blue_excess),
+                'selected': False
             }
         return None
 
@@ -140,13 +170,11 @@ class WaterlineDetector:
         laplacian = cv2.Laplacian(gray, cv2.CV_64F)
         texture_strength = np.abs(laplacian)
         row_texture = np.mean(texture_strength, axis=1)
+        self._last_texture_signal = row_texture.copy()
         min_texture_idx = np.argmin(row_texture)
         min_texture = row_texture[min_texture_idx]
         mean_texture = np.mean(row_texture)
-        if mean_texture > 0:
-            smoothness = 1.0 - (min_texture / mean_texture)
-        else:
-            smoothness = 0.0
+        smoothness = 1.0 - (min_texture / mean_texture) if mean_texture > 0 else 0.0
         confidence = smoothness * 0.7
         if smoothness > 0.3 and confidence > self.min_confidence:
             waterline_y = self.roi.y_min + min_texture_idx
@@ -155,40 +183,43 @@ class WaterlineDetector:
                 'confidence': confidence,
                 'quality': smoothness,
                 'method': 'texture',
-                'smoothness': smoothness
+                'smoothness': float(smoothness),
+                'texture_idx_roi': int(min_texture_idx),
+                'signal': row_texture.tolist(),
+                'signal_peak': float(min_texture),
+                'selected': False
             }
         return None
 
-    def _combine_results(
-        self,
-        results: list,
-        frame_height: int
-    ) -> WaterlineResult:
+    def _combine_results(self, results: List[Dict], frame_height: int) -> WaterlineResult:
         if not results:
+            self._last_candidates = []
             return WaterlineResult(
                 detected=False,
                 waterline_y=None,
                 confidence=0.0,
                 method="none",
                 quality_score=0.0,
-                raw_signal={}
+                raw_signal={},
+                candidates=[]
             )
         total_weight = sum(r['confidence'] for r in results)
         if total_weight > 0:
-            weighted_y = sum(
-                r['waterline_y'] * r['confidence']
-                for r in results
-            ) / total_weight
+            weighted_y = sum(r['waterline_y'] * r['confidence'] for r in results) / total_weight
             avg_confidence = sum(r['confidence'] for r in results) / len(results)
             avg_quality = sum(r['quality'] for r in results) / len(results)
             best_method = max(results, key=lambda r: r['confidence'])['method']
+            best_idx = max(range(len(results)), key=lambda i: results[i]['confidence'])
+            for i, r in enumerate(results):
+                r['selected'] = (i == best_idx)
             return WaterlineResult(
                 detected=True,
                 waterline_y=weighted_y,
                 confidence=avg_confidence,
                 method=best_method,
                 quality_score=avg_quality,
-                raw_signal={'detections': results}
+                raw_signal={'detections': results},
+                candidates=results
             )
         return WaterlineResult(
             detected=False,
@@ -196,8 +227,36 @@ class WaterlineDetector:
             confidence=0.0,
             method="none",
             quality_score=0.0,
-            raw_signal={}
+            raw_signal={},
+            candidates=[]
         )
+
+    def get_diagnostics(self) -> Dict[str, Any]:
+        stability = 'unknown'
+        if self._previous_waterline is not None and self._last_candidates:
+            latest = self._last_candidates[0]['waterline_y'] if self._last_candidates else None
+            if latest is not None:
+                delta = abs(latest - self._previous_waterline)
+                if delta < 5:
+                    stability = 'stable'
+                elif delta < 20:
+                    stability = 'unstable'
+                else:
+                    stability = 'jittering'
+        return {
+            'roi': self.roi.to_dict(),
+            'frame_count': self._frame_count,
+            'avg_brightness': round(self._avg_brightness, 1),
+            'candidate_count': len(self._last_candidates),
+            'previous_waterline': self._previous_waterline,
+            'detection_stability': stability,
+            'edge_threshold': self.edge_threshold,
+            'blue_excess_threshold': self.blue_excess_threshold,
+            'min_confidence': self.min_confidence,
+            'has_edge_signal': self._last_edge_signal is not None,
+            'has_color_signal': self._last_color_signal is not None,
+            'has_texture_signal': self._last_texture_signal is not None,
+        }
 
 
 def create_default_detector(

@@ -132,8 +132,8 @@ def start_backend():
         ],
         cwd=str(PROJECT_ROOT),
         env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=None,
+        stderr=None,
     )
 
     log(f"Waiting for backend at {BACKEND_URL}...")
@@ -161,8 +161,8 @@ def start_frontend():
     process = subprocess.Popen(
         [npm_cmd, "run", "dev"],
         cwd=str(FRONTEND_DIR),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=None,
+        stderr=None,
     )
 
     log(f"Waiting for frontend at {FRONTEND_URL}...")

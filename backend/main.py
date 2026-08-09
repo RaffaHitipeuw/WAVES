@@ -67,6 +67,8 @@ async def start():
     processing = True
     if mode == "video":
         video_cap = cv2.VideoCapture("asset.mp4")
+    elif mode == "simulator":
+        simulator.start()
     asyncio.create_task(process_loop())
     return {"status": "started"}
 
@@ -75,6 +77,7 @@ async def start():
 async def stop():
     global processing, video_cap
     processing = False
+    simulator.stop()
     if video_cap:
         video_cap.release()
         video_cap = None
@@ -132,6 +135,15 @@ async def process_loop():
             reading = simulator._generate_reading()
             if reading:
                 result = engine.process(reading)
+                result["diagnostics"] = {
+                    "state": "SIMULATOR",
+                    "reasons": [],
+                    "permitted_inferences": ["simulated_water_level"],
+                    "blocked_inferences": []
+                }
+                result["evidence"] = {}
+                result["signals"] = {}
+                result["candidates"] = []
                 await broadcast(result)
         elif mode == "video":
             if video_cap is None or not video_cap.isOpened():
@@ -147,13 +159,30 @@ async def process_loop():
                 source=DataSource.SENSOR
             )
             engine_result = engine.process(water_reading)
+            signals = result.get("signals", {})
+            for sig_key in ["edge", "color", "texture"]:
+                sig = signals.get(sig_key)
+                if sig and sig.get("data"):
+                    data = sig["data"]
+                    step = max(1, len(data) // 40)
+                    sig["data"] = data[::step]
+                    sig["downsampled"] = True
+                    sig["original_length"] = len(data)
             full_result = {
                 **engine_result,
                 "video": {
                     "frameIndex": result.get("frame_index", 0),
                     "measurement": result.get("measurement", {}),
-                    "progress": video_cap.get(cv2.CAP_PROP_POS_FRAMES) / video_cap.get(cv2.CAP_PROP_FRAME_COUNT)
-                }
+                    "progress": video_cap.get(cv2.CAP_PROP_POS_FRAMES) / video_cap.get(cv2.CAP_PROP_FRAME_COUNT) if video_cap.get(cv2.CAP_PROP_FRAME_COUNT) > 0 else 0
+                },
+                "detection": result.get("detection", {}),
+                "temporal": result.get("temporal", {}),
+                "diagnostics": result.get("diagnostics", {}),
+                "evidence": result.get("evidence", {}),
+                "signals": signals,
+                "candidates": result.get("detection", {}).get("candidates", []),
+                "risk": result.get("risk", "SAFE"),
+                "risk_confidence": result.get("risk_confidence", 0.0)
             }
             await broadcast(full_result)
         await asyncio.sleep(simulator.interval_ms / 1000)
@@ -178,9 +207,10 @@ app.router.routes.append(WebSocketRoute("/ws", ws_handler))
 
 
 async def broadcast(data):
+    payload = {"type": "reading", "data": data}
     for ws in connected_websockets.copy():
         try:
-            await ws.send_json(data)
+            await ws.send_json(payload)
         except Exception:
             connected_websockets.discard(ws)
 

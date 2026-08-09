@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const WS_URL = 'ws://localhost:8000/ws'
+const WS_URL = 'ws://127.0.0.1:8000/ws'
 const MAX_HISTORY = 60
 
 export function useFloodWebSocket() {
@@ -12,6 +12,7 @@ export function useFloodWebSocket() {
   const wsRef = useRef(null)
   const reconnectTimeoutRef = useRef(null)
   const reconnectAttempts = useRef(0)
+  const intentionalClose = useRef(false)
 
   const addToHistory = useCallback((reading) => {
     setHistory(prev => {
@@ -25,7 +26,7 @@ export function useFloodWebSocket() {
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
-
+    intentionalClose.current = false
     setConnectionStatus('connecting')
     console.log('[WebSocket] Connecting to', WS_URL)
 
@@ -42,9 +43,10 @@ export function useFloodWebSocket() {
       wsRef.current.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
+          console.log('[WebSocket] Message received, type:', message.type, 'readingsProcessed:', message.data?.state?.readingsProcessed)
           handleMessage(message)
         } catch (err) {
-          console.error('[WebSocket] Parse error:', err)
+          console.warn('[WebSocket] Parse error:', err)
         }
       }
 
@@ -56,17 +58,16 @@ export function useFloodWebSocket() {
       }
 
       wsRef.current.onerror = (error) => {
-        console.error('[WebSocket] Error:', error)
-        setConnectionStatus('error')
+        console.warn('[WebSocket] Error event:', error.type || 'unknown')
       }
     } catch (err) {
-      console.error('[WebSocket] Connection error:', err)
+      console.warn('[WebSocket] Connection error:', err)
       setConnectionStatus('error')
-      scheduleReconnect()
     }
   }, [])
 
   const scheduleReconnect = useCallback(() => {
+    if (intentionalClose.current) return
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current)
     }
@@ -95,8 +96,10 @@ export function useFloodWebSocket() {
   }, [addToHistory])
 
   const disconnect = useCallback(() => {
+    intentionalClose.current = true
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current)
+      reconnectTimeoutRef.current = null
     }
     if (wsRef.current) {
       wsRef.current.close()

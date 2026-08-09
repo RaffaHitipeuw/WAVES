@@ -16,6 +16,23 @@ class TemporalState:
     invalid_detections: int
     detection_history: List[bool]
 
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            'waterline_y': self.waterline_y,
+            'raw_waterline_y': self.raw_waterline_y,
+            'smoothed_waterline_y': self.smoothed_waterline_y,
+            'rate_of_change': self.rate_of_change,
+            'trend': self.trend,
+            'confidence': self.confidence,
+            'valid_detections': self.valid_detections,
+            'invalid_detections': self.invalid_detections,
+            'detection_history': self.detection_history,
+        }
+
+    def get(self, key: str, default: Any = None) -> Any:
+        d = self.as_dict()
+        return d.get(key, default)
+
 
 class TemporalBuffer:
     def __init__(
@@ -179,7 +196,7 @@ class TemporalBuffer:
         return len(self._waterline_y) > 0
 
     @property
-    def detection_rate(self) -> float:
+    def detection_rate_value(self) -> float:
         if not self._detections:
             return 0.0
         return sum(1 for d in self._detections if d) / len(self._detections)

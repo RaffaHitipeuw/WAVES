@@ -28,9 +28,11 @@ import {
   Minus,
   Video,
   ActivitySquare,
-  AlertOctagon
+  AlertOctagon,
+  Bug
 } from 'lucide-react'
 import { useFloodWebSocket } from './hooks/useFloodWebSocket'
+import { CVDebugPanel, VideoOverlay } from './components/CVDebugPanel'
 
 const API_BASE = 'http://localhost:8000'
 
@@ -89,7 +91,7 @@ function formatTime(timestamp) {
   }
 }
 
-function StatusBar({ status, nodeId, mode, progress }) {
+function StatusBar({ status, nodeId, mode, progress, debugMode, onToggleDebug }) {
   return (
     <div className="status-bar">
       <div className="status-bar-logo">
@@ -117,17 +119,25 @@ function StatusBar({ status, nodeId, mode, progress }) {
         <div className="text-xs text-text-muted">
           <span className="text-text-secondary font-semibold">{nodeId}</span>
         </div>
+        <button
+          onClick={onToggleDebug}
+          className={`debug-toggle-btn ${debugMode ? 'active' : ''}`}
+          title="Toggle CV Debug Mode"
+        >
+          <Bug size={14} />
+          <span>CV DEBUG</span>
+        </button>
       </div>
     </div>
   )
 }
 
-function VideoMonitor({ videoRef, measurement, isPlaying, mode }) {
+function VideoMonitor({ videoRef, measurement, isPlaying, mode, overlays, wsData }) {
   const statusConfig = MEASUREMENT_STATUS[measurement?.measurementStatus] || MEASUREMENT_STATUS['NO_DETECTION']
   const StatusIcon = statusConfig.icon
 
   return (
-    <div className="video-monitor">
+    <div className="video-monitor" style={{ position: 'relative' }}>
       <video
         ref={videoRef}
         src="/asset.mp4"
@@ -136,6 +146,7 @@ function VideoMonitor({ videoRef, measurement, isPlaying, mode }) {
         muted
         playsInline
       />
+      <VideoOverlay data={wsData} overlays={overlays} />
       <div className="video-overlay" />
       <div className="video-timestamp">
         <div className="video-timestamp-badge">
@@ -555,6 +566,13 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [mode, setMode] = useState('video')
   const [systemMode, setSystemMode] = useState('video')
+  const [debugMode, setDebugMode] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const [overlays, setOverlays] = useState({
+    waterline: true,
+    candidates: true,
+    roi: true
+  })
   const videoRef = useRef(null)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
@@ -584,7 +602,11 @@ function App() {
   const handleStart = async () => {
     try {
       if (mode !== systemMode) {
-        await fetch(`${API_BASE}/api/mode?mode=${mode}`, { method: 'POST' })
+        await fetch(`${API_BASE}/api/mode`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode }),
+        })
         setSystemMode(mode)
       }
       const response = await fetch(`${API_BASE}/api/start`, { method: 'POST' })
@@ -622,6 +644,12 @@ function App() {
     setMode(newMode)
   }
 
+  const handleTogglePause = () => setIsPaused(p => !p)
+  const handleStep = () => {}
+  const handleToggleOverlay = (key) => {
+    setOverlays(o => ({ ...o, [key]: !o[key] }))
+  }
+
   return (
     <div className="app-shell">
       <div className="app-container">
@@ -630,6 +658,8 @@ function App() {
           nodeId={nodeId}
           mode={systemMode}
           progress={progress}
+          debugMode={debugMode}
+          onToggleDebug={() => setDebugMode(d => !d)}
         />
         <div className="mb-6">
           <VideoMonitor
@@ -637,6 +667,8 @@ function App() {
             measurement={measurement}
             isPlaying={isVideoPlaying}
             mode={systemMode}
+            overlays={overlays}
+            wsData={data}
           />
         </div>
         <div className="mb-6">
@@ -689,6 +721,21 @@ function App() {
         {(risk !== 'SAFE' || !isValid) && (
           <div className="mb-6 animate-fade-in">
             <RiskAlert measurement={measurement} data={data} />
+          </div>
+        )}
+
+        {debugMode && (
+          <div className="mb-6 animate-fade-in">
+            <CVDebugPanel
+              data={data}
+              isPaused={isPaused}
+              onStep={handleStep}
+              onReset={handleReset}
+              onTogglePause={handleTogglePause}
+              overlays={overlays}
+              onToggleOverlay={handleToggleOverlay}
+              isVideoMode={systemMode === 'video'}
+            />
           </div>
         )}
         <div className="app-footer">
