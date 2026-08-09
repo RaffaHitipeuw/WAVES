@@ -122,6 +122,9 @@ class CVPipeline:
                 'calibrated': False
             }
 
+        # Compute calibration quality early so it can be used in measurement confidence
+        calibration_conf = self._calibration_quality(calibration_result, temporal_state)
+
         measurement_result = self.measurement.process(
             raw_detection=detection_result.raw_signal if detection_result.detected else None,
             temporal_state=temporal_state,
@@ -135,7 +138,24 @@ class CVPipeline:
         if detection_result.detected:
             measurement_result.water_level = calibration_result.get('waterLevel')
             measurement_result.pixel_waterline = detection_result.waterline_y
-            measurement_result.confidence = detection_result.confidence * 0.6 + temporal_state.get('confidence', 0) * 0.4
+
+            det_signal = min(0.8, detection_result.confidence)
+            calib_quality = calibration_conf
+            evidence_penalty = (
+                1.0 if temporal_state.invalid_detections == 0
+                else max(0.2, 1.0 - temporal_state.invalid_detections * 0.1)
+            )
+
+            # Plausibility: penalise disagreement between detection and quality metrics.
+            # If quality_score is much lower than detection confidence, the signal
+            # may be strong but positionally unreliable.
+            quality_ratio = detection_result.quality_score / max(det_signal, 0.05)
+            quality_agreement = min(1.0, quality_ratio)
+            plausibility_penalty = max(0.3, quality_agreement)
+
+            measurement_result.confidence = round(
+                det_signal * calib_quality * evidence_penalty * plausibility_penalty, 3
+            )
 
         self._last_raw_detection = {
             'detected': detection_result.detected,
@@ -145,7 +165,7 @@ class CVPipeline:
             'quality_score': detection_result.quality_score
         }
 
-        risk, risk_confidence = self._determine_risk(measurement_result, temporal_state)
+        risk, risk_confidence = self._determine_risk(measurement_result, temporal_state, calibration_confidence=calibration_conf)
 
         evidence = self._calculate_evidence(
             detection_result, temporal_state, calibration_result
@@ -178,6 +198,7 @@ class CVPipeline:
             'waterLevel': measurement_result.water_level,
             'pixelWaterline': measurement_result.pixel_waterline,
             'confidence': measurement_result.confidence,
+            'calibrationConfidence': calibration_conf,
             'measurementStatus': measurement_result.measurement_status,
             'isValid': measurement_result.is_valid,
             'smoothedLevel': temporal_state.waterline_y
@@ -201,6 +222,53 @@ class CVPipeline:
             'evidence': evidence,
             'signals': signals
         }
+
+    def _calibration_quality(
+        self,
+        calibration_result: Dict,
+        temporal_state
+    ) -> float:
+        """Compute continuous calibration quality score.
+        Returns 0.0–1.0 based on calibration method, sample quality,
+        establishment age, and scene consistency.
+        """
+        if not calibration_result.get('calibrated'):
+            status = calibration_result.get('status', '')
+            if 'SAMPLING' in status:
+                # Count samples from status string e.g. "SAMPLING_BASELINE (2/5)"
+                try:
+                    parts = status.split('(')[1].split('/')
+                    current = int(parts[0])
+                    total = int(parts[1].rstrip(')'))
+                    # Partial calibration: linear ramp from 0 to 0.3
+                    return round((current / total) * 0.3, 3)
+                except (IndexError, ValueError):
+                    return 0.0
+            return 0.0
+
+        method = calibration_result.get('calibrationMethod', '')
+        base_conf = {
+            'relative': 0.5,
+            'relative_baseline': 0.6,
+            'absolute': 0.8
+        }.get(method, 0.4)
+
+        # Penalise for recent invalid detections (scene may have changed)
+        invalid = temporal_state.invalid_detections if hasattr(temporal_state, 'invalid_detections') else 0
+        invalid_penalty = min(0.2, invalid * 0.05)
+
+        # Penalise if baseline is stale (too many frames since establishment)
+        # relative calibration is sensitive to camera/scene changes
+        if method.startswith('relative'):
+            status = calibration_result.get('status', '')
+            if status == 'BASELINE_ESTABLISHED':
+                # Newly established — full confidence
+                return round(base_conf - invalid_penalty, 3)
+            elif status == 'CALIBRATED':
+                # Older calibration — reduce slightly
+                return round((base_conf - 0.1) - invalid_penalty, 3)
+
+        return round(max(0.0, base_conf - invalid_penalty), 3)
 
     def _calculate_evidence(
         self,
@@ -231,7 +299,27 @@ class CVPipeline:
             stability_conf = max(0.1, 1.0 - invalid * 0.15)
         else:
             stability_conf = min(1.0, valid / 10.0)
-        calibration_conf = 1.0 if calibration_result.get('calibrated') else 0.0
+
+        # Penalise correlated noise: if all recent detections have near-identical
+        # waterline_y values, the detector may be tracking a static wrong feature.
+        # Use std of recent detection_history (True=valid) waterline_y positions.
+        recent_y_values = []
+        for i, detected in enumerate(reversed(temporal_state.detection_history)):
+            if detected and self.temporal._waterline_y:
+                y_val = self.temporal._waterline_y[-(i + 1)]
+                if y_val is not None:
+                    recent_y_values.append(y_val)
+        if len(recent_y_values) >= 5:
+            y_std = float(np.std(recent_y_values))
+            # Very low std means all detections are at nearly the same pixel position.
+            # This is suspicious — penalise it. Allow ~3px std as minimum for "real" water.
+            if y_std < 2.0:
+                stability_conf = min(stability_conf, 0.2)
+            elif y_std < 5.0:
+                stability_conf = min(stability_conf, 0.5)
+        calibration_conf = self._calibration_quality(
+            calibration_result, temporal_state
+        )
         brightness = self.detector.get_diagnostics().get('avg_brightness', 128.0)
         lighting_conf = 1.0 if 30 <= brightness <= 220 else max(0.0, min(1.0, brightness / 128.0))
         plausibility_conf = 0.5
@@ -382,19 +470,37 @@ class CVPipeline:
     def _determine_risk(
         self,
         measurement: MeasurementResult,
-        temporal_state
+        temporal_state,
+        calibration_confidence: float = 0.0
     ) -> tuple:
         if not measurement.is_valid or measurement.water_level is None:
             return 'SAFE', 0.0
         level = measurement.water_level
+        meas_conf = measurement.confidence
+
+        # Evidential gate: do not escalate to WARNING/CRITICAL unless
+        # measurement confidence is above minimum threshold.
+        # This prevents risk escalation from poorly-evidenced measurements.
+        MIN_EVIDENCE_FOR_WARNING = 0.15
+        if meas_conf < MIN_EVIDENCE_FOR_WARNING:
+            # Level is elevated but evidence is insufficient — downgrade severity
+            if level >= 70:
+                return 'WATCH', round(meas_conf * 0.5, 3)
+            elif level >= 50:
+                return 'WATCH', round(meas_conf * 0.4, 3)
+            elif level >= 30:
+                return 'WATCH', round(meas_conf * 0.3, 3)
+            else:
+                return 'SAFE', round(meas_conf * 0.2, 3)
+
         if level >= 70:
-            return 'CRITICAL', 0.9
+            return 'CRITICAL', round(meas_conf, 3)
         elif level >= 50:
-            return 'WARNING', 0.85
+            return 'WARNING', round(meas_conf * 0.85, 3)
         elif level >= 30:
-            return 'WATCH', 0.8
+            return 'WATCH', round(meas_conf * 0.8, 3)
         else:
-            return 'SAFE', 0.95
+            return 'SAFE', round(meas_conf * 0.9, 3)
 
     def reset(self):
         self._frame_count = 0

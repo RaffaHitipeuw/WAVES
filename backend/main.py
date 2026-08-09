@@ -153,26 +153,48 @@ async def process_loop():
                 video_cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 continue
             result = pipeline.process_frame(frame, frame_index=int(video_cap.get(cv2.CAP_PROP_POS_FRAMES)))
-            water_reading = WaterLevelReading(
-                node_id="NODE-001",
-                water_level=result.get("measurement", {}).get("waterLevel", 0) or 0,
-                source=DataSource.SENSOR
-            )
-            engine_result = engine.process(water_reading)
+            cv_measurement = result.get("measurement", {})
+            cv_water_level = cv_measurement.get("waterLevel")
+            cv_confidence = cv_measurement.get("confidence", 0.0)
+            diagnostics = result.get("diagnostics", {})
+            blocked = set(diagnostics.get("blocked_inferences", []))
+
+            # Gate risk on blocked_inferences: do not escalate if risk_level is blocked
+            if 'risk_level' in blocked or 'water_level' in blocked:
+                effective_risk = 'SAFE'
+                effective_risk_confidence = 0.0
+            else:
+                effective_risk = result.get("risk", "SAFE")
+                effective_risk_confidence = result.get("risk_confidence", 0.0)
+
+            # Only feed to engine if detection succeeded; skip on no-detection to avoid fabricating 0
+            if cv_water_level is not None:
+                water_reading = WaterLevelReading(
+                    node_id="NODE-001",
+                    water_level=cv_water_level,
+                    source=DataSource.SENSOR
+                )
+                engine_result = engine.process(water_reading, cv_confidence=cv_confidence)
+            else:
+                # No detection this frame — engine holds last known state
+                engine_result = engine.process(
+                    WaterLevelReading(node_id="NODE-001", water_level=engine.state.water_level, source=DataSource.SENSOR),
+                    cv_confidence=0.0
+                )
             signals = result.get("signals", {})
             for sig_key in ["edge", "color", "texture"]:
                 sig = signals.get(sig_key)
                 if sig and sig.get("data"):
-                    data = sig["data"]
-                    step = max(1, len(data) // 40)
-                    sig["data"] = data[::step]
+                    sig_data = sig["data"]
+                    step = max(1, len(sig_data) // 40)
+                    sig["data"] = sig_data[::step]
                     sig["downsampled"] = True
-                    sig["original_length"] = len(data)
+                    sig["original_length"] = len(sig_data)
             full_result = {
                 **engine_result,
                 "video": {
                     "frameIndex": result.get("frame_index", 0),
-                    "measurement": result.get("measurement", {}),
+                    "measurement": cv_measurement,
                     "progress": video_cap.get(cv2.CAP_PROP_POS_FRAMES) / video_cap.get(cv2.CAP_PROP_FRAME_COUNT) if video_cap.get(cv2.CAP_PROP_FRAME_COUNT) > 0 else 0
                 },
                 "detection": result.get("detection", {}),
@@ -181,8 +203,11 @@ async def process_loop():
                 "evidence": result.get("evidence", {}),
                 "signals": signals,
                 "candidates": result.get("detection", {}).get("candidates", []),
-                "risk": result.get("risk", "SAFE"),
-                "risk_confidence": result.get("risk_confidence", 0.0)
+                "risk": effective_risk,
+                "risk_confidence": effective_risk_confidence,
+                "risk_blocked": 'risk_level' in blocked,
+                # Top-level measurement for frontend compatibility
+                "measurement": cv_measurement,
             }
             await broadcast(full_result)
         await asyncio.sleep(simulator.interval_ms / 1000)

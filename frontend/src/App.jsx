@@ -577,7 +577,8 @@ function App() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
   const nodeId = data?.node?.id || data?.state?.nodeId || 'NODE-001'
-  const measurement = data?.measurement
+  const videoMeasurement = data?.video?.measurement
+  const measurement = data?.measurement || videoMeasurement
   const state = data?.state || {}
   const processed = data?.processed || {}
   const frontendMeasurement = measurement || {

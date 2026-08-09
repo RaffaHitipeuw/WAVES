@@ -106,12 +106,10 @@ class MeasurementProcessor:
             return 0.0
         detection_conf = raw_detection.get('confidence', 0) if raw_detection else 0
         temporal_conf = temporal_state.get('confidence', 0)
-        confidence = (
-            detection_conf * 0.4 +
-            temporal_conf * 0.4 +
-            0.2
-        )
-        return min(1.0, max(0.0, confidence))
+        # Detection confidence is already counted in temporal_conf via the buffer.
+        # Weight it at 0.35 here to avoid double-counting signal strength.
+        confidence = detection_conf * 0.35 + temporal_conf * 0.35
+        return min(0.85, max(0.0, confidence))
 
     def validate_measurement(
         self,

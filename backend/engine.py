@@ -18,7 +18,7 @@ class EngineState:
     water_level: float = 0.0
     smoothed_level: float = 0.0
     rate_of_change: float = 0.0
-    confidence: float = 1.0
+    confidence: float = 0.0
     risk: RiskLevel = RiskLevel.SAFE
     last_reading_at: Optional[datetime] = None
     readings_processed: int = 0
@@ -84,7 +84,8 @@ class CoreEngine:
 
     def process(
         self,
-        reading: WaterLevelReading
+        reading: WaterLevelReading,
+        cv_confidence: Optional[float] = None
     ) -> Dict[str, Any]:
         self.state.readings_processed += 1
         self.state.last_reading_at = datetime.now()
@@ -96,6 +97,17 @@ class CoreEngine:
         self.state.rate_of_change = rate
         risk = self.determine_risk(reading.water_level, rate)
         self.state.risk = risk
+
+        # Confidence: use CV pipeline value if available (video mode),
+        # otherwise derive from buffer fill (simulator mode).
+        # Simulator cap at 0.8 — buffer fill is internal consistency,
+        # not evidential reliability about external truth.
+        if cv_confidence is not None:
+            self.state.confidence = round(cv_confidence, 3)
+        else:
+            buf_size = len(self.reading_buffer)
+            self.state.confidence = round(min(buf_size / 10.0, 0.8), 3)
+
         result = {
             "reading": reading.to_dict(),
             "processed": {
@@ -111,7 +123,7 @@ class CoreEngine:
         }
         print(
             f"[Flood Engine] Reading #{self.state.readings_processed}: "
-            f"{reading.water_level} cm | Risk: {risk.value}"
+            f"{reading.water_level} cm | Risk: {risk.value} | Conf: {self.state.confidence:.2f}"
         )
         self._emit_processed(result)
         return result

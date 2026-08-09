@@ -14,7 +14,7 @@ class SimulatorConfig:
     start_level: float = 20.0
     rise_rate: float = 0.5
     noise: float = 0.3
-    mode: str = "rising"
+    mode: str = "stable"
 
 
 class WaterLevelSimulator:
