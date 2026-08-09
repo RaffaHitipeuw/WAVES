@@ -43,7 +43,6 @@ export function useFloodWebSocket() {
       wsRef.current.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
-          console.log('[WebSocket] Message received, type:', message.type, 'readingsProcessed:', message.data?.state?.readingsProcessed)
           handleMessage(message)
         } catch (err) {
           console.warn('[WebSocket] Parse error:', err)

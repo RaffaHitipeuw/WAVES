@@ -579,14 +579,24 @@ function App() {
   const nodeId = data?.node?.id || data?.state?.nodeId || 'NODE-001'
   const measurement = data?.measurement
   const state = data?.state || {}
+  const processed = data?.processed || {}
+  const frontendMeasurement = measurement || {
+    waterLevel: processed.rawWaterLevel ?? state.waterLevel ?? 0,
+    smoothedLevel: processed.smoothedWaterLevel ?? state.smoothedLevel ?? 0,
+    confidence: processed.confidence ?? state.confidence ?? 0,
+    rateOfChange: processed.rateOfChange ?? state.rateOfChange ?? 0,
+    risk: state.risk || 'SAFE',
+    isValid: measurement ? (measurement.isValid !== false) : true,
+    measurementStatus: measurement?.measurementStatus || 'SIMULATOR',
+  }
 
-  const waterLevel = measurement?.waterLevel ?? state.waterLevel ?? 0
-  const smoothed = measurement?.smoothedLevel ?? state.smoothedLevel ?? 0
-  const confidence = measurement?.confidence ?? state.confidence ?? 0
-  const rateOfChange = measurement?.rateOfChange ?? state.rateOfChange ?? 0
+  const waterLevel = frontendMeasurement.waterLevel
+  const smoothed = frontendMeasurement.smoothedLevel
+  const confidence = frontendMeasurement.confidence
+  const rateOfChange = frontendMeasurement.rateOfChange
   const risk = state.risk || 'SAFE'
   const riskConfig = RISK_CONFIG[risk] || RISK_CONFIG.SAFE
-  const isValid = measurement?.isValid !== false
+  const isValid = frontendMeasurement.isValid !== false
   const progress = data?.video?.progress
 
   useEffect(() => {
@@ -664,7 +674,7 @@ function App() {
         <div className="mb-6">
           <VideoMonitor
             videoRef={videoRef}
-            measurement={measurement}
+            measurement={frontendMeasurement}
             isPlaying={isVideoPlaying}
             mode={systemMode}
             overlays={overlays}
@@ -672,12 +682,12 @@ function App() {
           />
         </div>
         <div className="mb-6">
-          <PrimaryDisplay measurement={measurement} risk={risk} />
+          <PrimaryDisplay measurement={frontendMeasurement} risk={risk} />
         </div>
         <div className="metric-grid mb-6">
           <MetricCard
             label="Smoothed"
-            value={measurement?.smoothedLevel != null ? formatNumber(measurement.smoothedLevel) : '--'}
+            value={smoothed != null ? formatNumber(smoothed) : '--'}
             unit="cm"
             trend={rateOfChange}
           />
@@ -687,7 +697,7 @@ function App() {
             unit="cm/min"
             trend={rateOfChange}
           />
-          <ConfidenceCard measurement={measurement} />
+          <ConfidenceCard measurement={frontendMeasurement} />
           <MetricCard
             label="Risk Level"
             value={riskConfig.label}
@@ -701,11 +711,11 @@ function App() {
           </MetricCard>
         </div>
         <div className="mb-6">
-          <WaterLevelChart history={history} measurement={measurement} />
+          <WaterLevelChart history={history} measurement={frontendMeasurement} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <RateOfRisePanel measurement={measurement} history={history} />
-          <SystemStatus measurement={measurement} data={data} mode={systemMode} />
+          <RateOfRisePanel measurement={frontendMeasurement} history={history} />
+          <SystemStatus measurement={frontendMeasurement} data={data} mode={systemMode} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <Controls
@@ -720,7 +730,7 @@ function App() {
         </div>
         {(risk !== 'SAFE' || !isValid) && (
           <div className="mb-6 animate-fade-in">
-            <RiskAlert measurement={measurement} data={data} />
+            <RiskAlert measurement={frontendMeasurement} data={data} />
           </div>
         )}
 
